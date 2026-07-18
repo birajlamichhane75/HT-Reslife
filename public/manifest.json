@@ -1,0 +1,23 @@
+{
+  "name": "HT Housing",
+  "short_name": "HT Housing",
+  "description": "Huston-Tillotson University Housing Application",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2F4F8",
+  "theme_color": "#1E4E8C",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/badge-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
