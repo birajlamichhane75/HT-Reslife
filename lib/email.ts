@@ -1,6 +1,7 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const apiKey = process.env.RESEND_API_KEY
+const resend = apiKey && apiKey !== 'undefined' && apiKey !== 'null' ? new Resend(apiKey) : null
 
 export async function sendMaintenanceConfirmation(
   to: string,
@@ -8,7 +9,7 @@ export async function sendMaintenanceConfirmation(
   issueType: string
 ) {
   try {
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
       console.warn('RESEND_API_KEY is not set. Skipping email notification.')
       return
     }
@@ -35,7 +36,7 @@ export async function sendTicketStatusUpdate(
   staffNotes: string | null
 ) {
   try {
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
       console.warn('RESEND_API_KEY is not set. Skipping email notification.')
       return
     }
