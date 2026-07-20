@@ -41,15 +41,54 @@ export async function POST(request: NextRequest) {
     // Step 4 — Use supabase.auth.admin.createUser / signInWithPassword
     const tempPassword = trimmedEmail + '_dev_temp_pw_hth2026'
 
-    // Attempt to create user (if already exists, this returns an error which we can ignore)
+    // Attempt to create user (if already exists, this returns an error which we will handle by resetting their password)
     const { error: createError } = await serviceSupabase.auth.admin.createUser({
       email: trimmedEmail,
       email_confirm: true,
       password: tempPassword,
     })
 
-    if (createError && !createError.message.includes('already registered')) {
-      console.warn('Non-critical user creation warning:', createError.message)
+    if (createError) {
+      if (createError.message.toLowerCase().includes('already registered') || createError.message.toLowerCase().includes('already been registered')) {
+        // User already exists in Auth, retrieve their user ID to update their password to the dev one
+        let page = 1
+        const perPage = 100
+        let authUser: any = null
+        while (true) {
+          const { data: { users }, error: listError } = await serviceSupabase.auth.admin.listUsers({
+            page,
+            perPage,
+          })
+          if (listError || !users || users.length === 0) {
+            break
+          }
+          const found = users.find((u: any) => u.email?.toLowerCase() === trimmedEmail)
+          if (found) {
+            authUser = found
+            break
+          }
+          if (users.length < perPage) {
+            break
+          }
+          page++
+        }
+
+        if (authUser) {
+          const { error: updatePwError } = await serviceSupabase.auth.admin.updateUserById(
+            authUser.id,
+            { password: tempPassword }
+          )
+          if (updatePwError) {
+            console.error('Failed to reset password for dev-login:', updatePwError)
+            return NextResponse.json({ error: 'Failed to update dev-login credentials.' }, { status: 500 })
+          }
+        } else {
+          console.error('Could not find existing auth user by email:', trimmedEmail)
+          return NextResponse.json({ error: 'Failed to retrieve auth user.' }, { status: 500 })
+        }
+      } else {
+        console.warn('Non-critical user creation warning:', createError.message)
+      }
     }
 
     // Step 5 — Set the session cookie using createServerClient
