@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 const ERROR_MESSAGES: Record<string, string> = {
   not_htu_email: 'Only @htu.edu email addresses are allowed.',
@@ -11,11 +10,10 @@ const ERROR_MESSAGES: Record<string, string> = {
 }
 
 function LoginContent() {
-  const supabase = createClient()
+  const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
 
   const errorParam = searchParams.get('error')
@@ -28,7 +26,6 @@ function LoginContent() {
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
     setLocalError(null)
-    setSuccess(false)
 
     const trimmedEmail = email.trim().toLowerCase()
     if (!trimmedEmail.endsWith('@htu.edu')) {
@@ -38,21 +35,25 @@ function LoginContent() {
 
     setLoading(true)
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : '')
-      const redirectUrl = `${baseUrl.replace(/\/$/, '')}/api/auth/callback`
-
-      const { error } = await supabase.auth.signInWithOtp({
-        email: trimmedEmail,
-        options: {
-          emailRedirectTo: redirectUrl,
+      const res = await fetch('/api/auth/dev-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ email: trimmedEmail }),
       })
 
-      if (error) {
-        setLocalError(error.message || 'Failed to send login link.')
+      const data = await res.json()
+
+      if (!res.ok || data.error) {
+        setLocalError(data.error || 'Failed to authenticate in dev mode.')
       } else {
-        setSuccess(true)
-        setEmail('')
+        // Redirect based on role
+        if (data.role === 'admin') {
+          router.push('/admin')
+        } else {
+          router.push('/')
+        }
       }
     } catch (err: any) {
       setLocalError('An unexpected error occurred. Please try again.')
@@ -73,17 +74,8 @@ function LoginContent() {
           <p className="text-sm text-gray-500 mt-1">Huston-Tillotson University</p>
         </div>
 
-        {/* Success message */}
-        {success && (
-          <div className="mb-6 p-3 rounded-lg bg-green-50 border border-green-200">
-            <p className="text-sm text-green-700 font-medium">
-              Check your HTU email — we sent you a login link.
-            </p>
-          </div>
-        )}
-
         {/* Error message */}
-        {displayError && !success && (
+        {displayError && (
           <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200">
             <p className="text-sm text-red-700 font-medium">{displayError}</p>
           </div>
@@ -99,7 +91,7 @@ function LoginContent() {
               type="email"
               id="email"
               required
-              placeholder="yourname@htu.edu"
+              placeholder="your@htu.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#1E4E8C] focus:ring-1 focus:ring-[#1E4E8C] transition-all"
@@ -111,9 +103,15 @@ function LoginContent() {
             disabled={loading}
             className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-[#1E4E8C] text-white font-semibold text-sm hover:bg-[#1a4279] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Sending link...' : 'Send login link'}
+            {loading ? 'Entering...' : 'Enter app'}
           </button>
         </form>
+
+        {/* Amber Warning Banner for Dev Mode */}
+        <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-250 text-amber-850 text-xs font-medium leading-relaxed">
+          Dev mode — type any registered @htu.edu email to enter.
+          No password required.
+        </div>
 
         <p className="mt-6 text-center text-xs text-gray-450 leading-relaxed font-medium">
           Only registered on-campus residents can log in.
