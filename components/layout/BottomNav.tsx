@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   {
     label: 'Home',
     href: '/',
@@ -57,7 +57,7 @@ export default function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E8EF] z-40 max-w-[430px] mx-auto px-4 py-2 flex items-center justify-around shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E8EF] z-40 max-w-[430px] mx-auto px-4 py-2 flex items-center justify-around shadow-[0_-4px_12px_rgba(0,0,0,0.03)] md:hidden">
       {NAV_ITEMS.map((item) => {
         const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
         return (

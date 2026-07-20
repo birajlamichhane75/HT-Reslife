@@ -5,6 +5,14 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const response = NextResponse.next()
 
+  // Skip middleware logic for static assets and public folder files
+  if (
+    pathname.includes('.') ||
+    pathname.startsWith('/_next')
+  ) {
+    return response
+  }
+
   // Initialize server client for middleware session refreshing
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
