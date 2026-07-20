@@ -21,9 +21,7 @@ export default function TopBar({ studentName }: { studentName: string }) {
   return (
     <header className="sticky top-0 bg-white border-b border-[#E5E8EF] z-30 px-5 py-3.5 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-8.5 h-8.5 rounded-lg bg-brand text-white font-bold text-sm">
-          HT
-        </div>
+        <img src="/logo-ht.png" alt="HT Logo" className="w-8 h-8 object-contain" />
         <div>
           <h2 className="text-sm font-semibold text-gray-900 leading-tight font-display">HT Housing</h2>
           {studentName && (

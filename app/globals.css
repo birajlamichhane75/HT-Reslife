@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply font-sans bg-[#F2F4F8] text-gray-900;
+    @apply font-sans bg-[#FFFAEB] text-[#291C14];
   }
   
   h1, h2, h3, h4, h5, h6 {

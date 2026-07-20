@@ -10,7 +10,7 @@ export default function HeroCard({
   roomNumber: string | null
 }) {
   return (
-    <div className="w-full bg-gradient-to-br from-brand via-[#245899] to-[#123663] text-white rounded-2xl p-6 shadow-md border border-white/10 relative overflow-hidden">
+    <div className="w-full bg-gradient-to-br from-brand via-[#4a0000] to-brand-terra text-white rounded-2xl p-6 shadow-md border border-white/10 relative overflow-hidden">
       {/* Decorative backdrop shapes */}
       <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-white/5 pointer-events-none" />
       <div className="absolute right-12 -top-12 w-24 h-24 rounded-full bg-white/5 pointer-events-none" />

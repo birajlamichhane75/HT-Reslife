@@ -4,44 +4,36 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 
 const HALLS = {
-  'Heritage Hall': {
-    address: '1820 East 8th Street, Austin, TX 78702',
-    mapSrc: 'https://maps.google.com/maps?q=Huston-Tillotson+University+Austin+TX+Heritage+Hall&output=embed',
-    rooms: '120 rooms — co-ed by floor',
-    laundry: 'Floors 1 and 3',
-    wifi: 'ResNet Wi-Fi throughout',
-    amenity: 'Lounge on each floor',
-  },
-  'Lawson Hall': {
+  'Allen-Frazier Hall': {
     address: '900 Chicon Street, Austin, TX 78702',
-    mapSrc: 'https://maps.google.com/maps?q=Huston-Tillotson+University+Austin+TX+Lawson+Hall&output=embed',
-    rooms: '150 rooms — freshman residency',
-    laundry: 'Ground floor laundry room',
-    wifi: 'ResNet Wi-Fi throughout',
-    amenity: 'Study rooms & computer lab',
+    mapSrc: 'https://maps.google.com/maps?q=Huston-Tillotson+University+Austin+TX+Allen-Frazier+Hall&output=embed',
+    population: 'Women Only',
+    type: 'Traditional Residence Hall',
+    features: 'Suite-style living, community lounges, study areas',
+    details: 'Laundry facilities, high-speed Wi-Fi',
   },
-  'Allen Hall': {
+  'Beard-Burrowes Hall': {
     address: '900 Chicon Street, Austin, TX 78702',
-    mapSrc: 'https://maps.google.com/maps?q=Huston-Tillotson+University+Austin+TX+Allen+Hall&output=embed',
-    rooms: '100 rooms — male-only residency',
-    laundry: 'First floor lobby',
-    wifi: 'ResNet Wi-Fi throughout',
-    amenity: 'Game room & common lounge',
+    mapSrc: 'https://maps.google.com/maps?q=Huston-Tillotson+University+Austin+TX+Beard-Burrowes+Hall&output=embed',
+    population: 'Men Only',
+    type: 'Traditional Residence Hall',
+    features: 'Community bathrooms, programming spaces',
+    details: 'Resident Assistant support, laundry, Wi-Fi',
   },
-  'University Suites': {
-    address: '1001 Chicon Street, Austin, TX 78702',
-    mapSrc: 'https://maps.google.com/maps?q=Huston-Tillotson+University+Austin+TX+Suites&output=embed',
-    rooms: '80 suite-style rooms — upperclassmen',
-    laundry: 'Laundry room on floor 2',
-    wifi: 'ResNet Wi-Fi & ethernet ports',
-    amenity: 'Kitchenette in each suite',
+  'Teresa Hall': {
+    address: '3001 South Congress Avenue, Building TERE, Austin, TX 78704',
+    mapSrc: 'https://maps.google.com/maps?q=3001+South+Congress+Avenue+Austin+TX+78704&output=embed',
+    population: 'Co-ed (Upperclassmen, Returning, Staff)',
+    type: 'Partnered Campus Housing',
+    features: 'Furnished rooms, secure card-access, lounges, study spaces',
+    details: 'St. Edward\'s University campus partnership, shuttle transit, kitchen, laundry',
   },
 }
 
 type HallName = keyof typeof HALLS
 
 export default function CampusMapPage() {
-  const [selectedHall, setSelectedHall] = useState<HallName>('Heritage Hall')
+  const [selectedHall, setSelectedHall] = useState<HallName>('Allen-Frazier Hall')
   const hall = HALLS[selectedHall]
 
   return (
@@ -103,20 +95,20 @@ export default function CampusMapPage() {
 
         <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4 text-xs">
           <div>
-            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Capacity / Layout</span>
-            <p className="font-semibold text-gray-800 mt-0.5">{hall.rooms}</p>
+            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Population</span>
+            <p className="font-semibold text-gray-800 mt-0.5">{hall.population}</p>
           </div>
           <div>
-            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">WiFi Network</span>
-            <p className="font-semibold text-gray-800 mt-0.5">{hall.wifi}</p>
+            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Housing Type</span>
+            <p className="font-semibold text-gray-800 mt-0.5">{hall.type}</p>
           </div>
-          <div>
-            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Laundry Facilities</span>
-            <p className="font-semibold text-gray-800 mt-0.5">{hall.laundry}</p>
+          <div className="col-span-2">
+            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Living Features</span>
+            <p className="font-semibold text-gray-800 mt-0.5">{hall.features}</p>
           </div>
-          <div>
-            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Premium Amenity</span>
-            <p className="font-semibold text-gray-800 mt-0.5">{hall.amenity}</p>
+          <div className="col-span-2">
+            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Amenities & Highlights</span>
+            <p className="font-semibold text-gray-800 mt-0.5">{hall.details}</p>
           </div>
         </div>
       </div>

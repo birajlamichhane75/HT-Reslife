@@ -6,15 +6,24 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#1E4E8C',
-          light: '#E8EFF9',
-          mid: '#3A6AB0',
+          DEFAULT: '#660100', // HT Maroon
+          light: '#F7E3B8',   // Ember
+          mid: '#FAAB8A',     // Bloom
+          maroon: '#660100',
+          gold: '#FFCC00',
+          ember: '#F7E3B8',
+          crimson: '#FA2626',
+          bloom: '#FAAB8A',
+          ecogreen: '#00373E',
+          fresh: '#C7EDBF',
+          terra: '#291C14',
+          sand: '#FFFAEB',
         },
-        accent: '#F4A942',
+        accent: '#FFCC00',    // HT Gold
         surface: {
           1: '#FFFFFF',
-          2: '#F8F9FC',
-          3: '#F2F4F8',
+          2: '#FFFAEB',       // Sand
+          3: '#F7E3B8',       // Ember
         },
       },
       fontFamily: {

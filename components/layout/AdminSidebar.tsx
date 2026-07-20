@@ -75,7 +75,7 @@ export default function AdminSidebar() {
       {/* Mobile Top Bar */}
       <div className="lg:hidden flex items-center justify-between bg-white border-b border-[#E5E8EF] px-5 py-4 w-full sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-sm">HT</div>
+          <img src="/logo-ht.png" alt="HT Logo" className="w-8 h-8 object-contain" />
           <span className="font-display font-semibold text-gray-900 text-sm">HT Housing Admin</span>
         </div>
         <button
@@ -100,7 +100,7 @@ export default function AdminSidebar() {
         <div>
           {/* Logo */}
           <div className="hidden lg:flex items-center gap-3 px-6 py-6 border-b border-[#E5E8EF]">
-            <div className="w-9 h-9 rounded-lg bg-brand flex items-center justify-center text-white font-bold text-base">HT</div>
+            <img src="/logo-ht.png" alt="HT Logo" className="w-9 h-9 object-contain" />
             <div>
               <h1 className="font-display font-semibold text-gray-900 text-sm leading-none">HT Housing</h1>
               <span className="text-[10px] font-semibold text-brand tracking-wider uppercase">Admin Portal</span>

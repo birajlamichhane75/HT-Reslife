@@ -21,7 +21,7 @@ export default async function StudentLayout({
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-[#F2F4F8] flex flex-col max-w-[430px] mx-auto relative border-x border-gray-150/50 shadow-lg">
+      <div className="min-h-screen bg-[#FFFAEB] flex flex-col max-w-[430px] mx-auto relative border-x border-gray-150/50 shadow-lg">
         <TopBar studentName={student?.full_name ?? ''} />
         <main className="flex-1 overflow-y-auto pb-20">
           {children}

@@ -64,15 +64,13 @@ function ConfirmContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F2F4F8] flex items-center justify-center p-4 animate-fade-in">
+    <main className="min-h-screen bg-[#FFFAEB] flex items-center justify-center p-4 animate-fade-in">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         {/* Logo / Brand */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-[#1E4E8C] mb-4 shadow-md shadow-[#1E4E8C]/20 hover:scale-105 transition-transform duration-250">
-            <span className="text-white font-bold text-xl">HT</span>
-          </div>
+        <div className="mb-6 text-center flex flex-col items-center">
+          <img src="/logo-mascot.png" alt="HTU Mascot" className="w-24 h-24 object-contain mb-3 hover:scale-105 transition-transform duration-250" />
           <h1 className="text-xl font-semibold text-gray-900 font-display">HT Housing</h1>
-          <p className="text-sm text-gray-500 mt-1">Huston-Tillotson University</p>
+          <p className="text-sm text-gray-500 mt-0.5">Huston-Tillotson University</p>
         </div>
 
         {/* Error message */}
@@ -110,7 +108,7 @@ function ConfirmContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-[#1E4E8C] text-white font-semibold text-sm hover:bg-[#1a4279] active:scale-[0.98] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-brand text-white font-semibold text-sm hover:bg-[#520100] active:scale-[0.98] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -148,15 +146,13 @@ function ConfirmContent() {
 export default function ConfirmPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen bg-[#F2F4F8] flex items-center justify-center p-4">
-        <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-[#1E4E8C] mb-4 shadow-md shadow-[#1E4E8C]/20">
-            <span className="text-white font-bold text-xl">HT</span>
-          </div>
+      <main className="min-h-screen bg-[#FFFAEB] flex items-center justify-center p-4">
+        <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center flex flex-col items-center">
+          <div className="w-24 h-24 bg-gray-100 rounded-full mb-4 animate-pulse"></div>
           <h1 className="text-xl font-semibold text-gray-900 font-display">HT Housing</h1>
           <p className="text-sm text-gray-500 mt-1 mb-6">Huston-Tillotson University</p>
           <div className="flex items-center justify-center gap-3 py-3 text-sm text-gray-500 font-medium">
-            <svg className="animate-spin h-5 w-5 text-[#1E4E8C]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg className="animate-spin h-5 w-5 text-brand" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>

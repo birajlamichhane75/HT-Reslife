@@ -63,15 +63,13 @@ function LoginContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F2F4F8] flex items-center justify-center p-4">
+    <main className="min-h-screen bg-[#FFFAEB] flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         {/* Logo / Brand */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-[#1E4E8C] mb-4">
-            <span className="text-white font-bold text-xl">HT</span>
-          </div>
+        <div className="mb-6 text-center flex flex-col items-center">
+          <img src="/logo-mascot.png" alt="HTU Mascot" className="w-24 h-24 object-contain mb-3" />
           <h1 className="text-xl font-semibold text-gray-900 font-display">HT Housing</h1>
-          <p className="text-sm text-gray-500 mt-1">Huston-Tillotson University</p>
+          <p className="text-sm text-gray-500 mt-0.5">Huston-Tillotson University</p>
         </div>
 
         {/* Error message */}
@@ -84,7 +82,7 @@ function LoginContent() {
         {/* Sign in form */}
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
-            <label htmlFor="email" className="block text-xs font-semibold text-gray-650 mb-1.5">
+            <label htmlFor="email" className="block text-xs font-semibold text-gray-605 mb-1.5">
               HTU Email Address
             </label>
             <input
@@ -94,26 +92,26 @@ function LoginContent() {
               placeholder="your@htu.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#1E4E8C] focus:ring-1 focus:ring-[#1E4E8C] transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-all"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-[#1E4E8C] text-white font-semibold text-sm hover:bg-[#1a4279] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-brand text-white font-semibold text-sm hover:bg-[#520100] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Entering...' : 'Enter app'}
           </button>
         </form>
 
         {/* Amber Warning Banner for Dev Mode */}
-        <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-250 text-amber-850 text-xs font-medium leading-relaxed">
+        <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs font-medium leading-relaxed">
           Dev mode — type any registered @htu.edu email to enter.
           No password required.
         </div>
 
-        <p className="mt-6 text-center text-xs text-gray-450 leading-relaxed font-medium">
+        <p className="mt-6 text-center text-xs text-gray-400 leading-relaxed font-medium">
           Only registered on-campus residents can log in.
           Contact the Housing Office if you did not receive your link.
         </p>
@@ -125,15 +123,13 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen bg-[#F2F4F8] flex items-center justify-center p-4">
-        <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center animate-pulse">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-[#1E4E8C] mb-4">
-            <span className="text-white font-bold text-xl">HT</span>
-          </div>
+      <main className="min-h-screen bg-[#FFFAEB] flex items-center justify-center p-4">
+        <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center animate-pulse flex flex-col items-center">
+          <div className="w-24 h-24 bg-gray-100 rounded-full mb-4"></div>
           <h1 className="text-xl font-semibold text-gray-900 font-display">HT Housing</h1>
           <p className="text-sm text-gray-500 mt-1 mb-6">Huston-Tillotson University</p>
-          <div className="h-10 bg-gray-100 rounded-xl mb-4"></div>
-          <div className="h-10 bg-gray-200 rounded-xl"></div>
+          <div className="h-10 w-full bg-gray-100 rounded-xl mb-4"></div>
+          <div className="h-10 w-full bg-gray-200 rounded-xl"></div>
         </div>
       </main>
     }>
