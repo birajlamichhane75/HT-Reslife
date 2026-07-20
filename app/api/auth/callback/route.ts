@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -14,20 +14,53 @@ export async function GET(request: NextRequest) {
     }
 
     if (!error && data.session) {
-      const email = data.session.user.email ?? ''
+      const user = data.session.user
+      const email = user.email ?? ''
 
       // Check if email ends in @htu.edu
       const isHtuEmail = email.endsWith('@htu.edu')
 
-      // Check if email exists in students table and is_active is true
       let student = null
+
       if (isHtuEmail) {
-        const { data: studentData } = await supabase
+        // Use service role client to query and update the student profile securely
+        const serviceSupabase = createServiceRoleClient()
+
+        // 1. Check if a student already exists with the user's Auth ID
+        const { data: studentById } = await serviceSupabase
           .from('students')
           .select('id, role, is_active')
-          .eq('email', email)
-          .single()
-        student = studentData
+          .eq('id', user.id)
+          .maybeSingle()
+
+        student = studentById
+
+        // 2. If not found by ID, look up by email to link the pre-registered student profile
+        if (!student) {
+          const { data: studentByEmail } = await serviceSupabase
+            .from('students')
+            .select('id, role, is_active')
+            .eq('email', email)
+            .maybeSingle()
+
+          if (studentByEmail) {
+            // Link the pre-registered student record by updating its ID to the auth user ID
+            const { error: updateError } = await serviceSupabase
+              .from('students')
+              .update({ id: user.id })
+              .eq('email', email)
+
+            if (updateError) {
+              console.error('Failed to link student auth ID:', updateError)
+            } else {
+              student = {
+                id: user.id,
+                role: studentByEmail.role,
+                is_active: studentByEmail.is_active,
+              }
+            }
+          }
+        }
       }
 
       // If either check fails: sign out and redirect to /login?error=not_registered

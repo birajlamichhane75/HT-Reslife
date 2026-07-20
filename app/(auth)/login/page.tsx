@@ -38,39 +38,21 @@ function LoginContent() {
 
     setLoading(true)
     try {
-      const shouldBypass = process.env.NEXT_PUBLIC_BYPASS_EMAIL_AUTH === 'true'
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : '')
+      const redirectUrl = `${baseUrl.replace(/\/$/, '')}/api/auth/callback`
 
-      if (shouldBypass) {
-        const res = await fetch('/api/auth/bypass', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: trimmedEmail }),
-        })
+      const { error } = await supabase.auth.signInWithOtp({
+        email: trimmedEmail,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
+      })
 
-        const data = await res.json()
-
-        if (!res.ok || data.error) {
-          setLocalError(data.error === 'not_registered' ? ERROR_MESSAGES.not_registered : (data.error || 'Failed to bypass authentication.'))
-        } else if (data.action_link) {
-          window.location.href = data.action_link
-        }
+      if (error) {
+        setLocalError(error.message || 'Failed to send login link.')
       } else {
-        const redirectUrl = (process.env.NEXT_PUBLIC_APP_URL || window.location.origin) + '/confirm'
-        const { error } = await supabase.auth.signInWithOtp({
-          email: trimmedEmail,
-          options: {
-            emailRedirectTo: redirectUrl,
-          },
-        })
-
-        if (error) {
-          setLocalError(error.message || 'Failed to send login link.')
-        } else {
-          setSuccess(true)
-          setEmail('')
-        }
+        setSuccess(true)
+        setEmail('')
       }
     } catch (err: any) {
       setLocalError('An unexpected error occurred. Please try again.')
