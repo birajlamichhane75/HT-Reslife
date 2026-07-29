@@ -24,3 +24,13 @@ export async function verifyAdmin(req: NextRequest): Promise<Student | null> {
   if (!student || student.role !== 'admin') return null
   return student
 }
+
+// Use in API routes to verify a cafeteria admin
+export async function verifyCafeteriaAdmin(
+  req: NextRequest
+): Promise<Student | null> {
+  const student = await verifyStudent(req)
+  if (!student || (student.role !== 'cafeteria_admin' && student.role !== 'admin')) return null
+  return student
+}
+

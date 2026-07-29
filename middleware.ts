@@ -53,6 +53,23 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Cafeteria admin route guard
+  if (pathname.startsWith('/cafeteria-admin')) {
+    const { data: student } = await supabase
+      .from('students')
+      .select('role, is_active')
+      .eq('id', session?.user.id)
+      .single()
+
+    if (
+      !student ||
+      (student.role !== 'cafeteria_admin' && student.role !== 'admin') ||
+      !student.is_active
+    ) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  }
+
   return response
 }
 

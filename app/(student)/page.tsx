@@ -32,6 +32,9 @@ export default async function StudentDashboard() {
   ])
 
   const student = studentRes.data
+  if (student && student.role === 'cafeteria_admin') {
+    redirect('/cafeteria-admin')
+  }
   const announcements = announcementsRes.data || []
   const openTicketsCount = ticketsCountRes.count || 0
 
@@ -113,6 +116,16 @@ export default async function StudentDashboard() {
       icon: (
         <svg className="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Campus Dining',
+      href: '/dining',
+      bg: 'bg-amber-50/50 border-amber-100 hover:border-amber-300 text-amber-700',
+      icon: (
+        <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
       ),
     },

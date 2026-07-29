@@ -51,6 +51,8 @@ function LoginContent() {
         // Redirect based on role
         if (data.role === 'admin') {
           router.push('/admin')
+        } else if (data.role === 'cafeteria_admin') {
+          router.push('/cafeteria-admin')
         } else {
           router.push('/')
         }
