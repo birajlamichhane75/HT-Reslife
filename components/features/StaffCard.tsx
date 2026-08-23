@@ -52,7 +52,7 @@ export function StaffCard({ staff }: { staff: StaffMember }) {
   )
 }
 
-export function StaffList({ initialStaff }: { initialStaff: StaffMember[] }) {
+export function StaffList({ initialStaff, initialRas = [] }: { initialStaff: StaffMember[]; initialRas?: any[] }) {
   const [search, setSearch] = useState('')
 
   const filteredStaff = initialStaff.filter((s) => {
@@ -61,6 +61,14 @@ export function StaffList({ initialStaff }: { initialStaff: StaffMember[] }) {
       s.full_name.toLowerCase().includes(term) ||
       s.role.toLowerCase().includes(term) ||
       (s.hall && s.hall.toLowerCase().includes(term))
+    )
+  })
+
+  const filteredRas = initialRas.filter((r) => {
+    const term = search.toLowerCase()
+    return (
+      r.full_name.toLowerCase().includes(term) ||
+      (r.building && r.building.toLowerCase().includes(term))
     )
   })
 
@@ -97,6 +105,22 @@ export function StaffList({ initialStaff }: { initialStaff: StaffMember[] }) {
         )}
       </div>
 
+      {/* Resident Assistants (RAs) Section */}
+      <div className="flex flex-col gap-3 mt-2">
+        <h3 className="font-display font-semibold text-gray-900 text-xs uppercase tracking-wider">
+          Resident Assistants (RAs)
+        </h3>
+        {filteredRas.length === 0 ? (
+          <p className="text-xs text-gray-400 italic px-1">No Resident Assistants (RAs) registered or found matching search.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredRas.map((ra) => (
+              <RACard key={ra.id} ra={ra} />
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Housing Office Section */}
       <div className="flex flex-col gap-3 mt-2">
         <h3 className="font-display font-semibold text-gray-900 text-xs uppercase tracking-wider">
@@ -113,5 +137,47 @@ export function StaffList({ initialStaff }: { initialStaff: StaffMember[] }) {
         )}
       </div>
     </div>
+  )
+}
+
+export function RACard({ ra }: { ra: any }) {
+  const initials = ra.full_name
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+
+  return (
+    <Card className="flex items-center gap-4 hover:scale-[1.01] transition-transform duration-200 p-4 border border-brand/10 bg-brand-light/10">
+      {/* Initials Avatar */}
+      <div className="w-11 h-11 rounded-full bg-brand/10 flex items-center justify-center text-brand font-bold text-sm font-display flex-shrink-0">
+        {initials}
+      </div>
+
+      {/* Info Column */}
+      <div className="flex-1 min-w-0">
+        <h4 className="font-display font-semibold text-gray-900 text-sm truncate">{ra.full_name}</h4>
+        <p className="text-xs text-gray-400 font-medium truncate">Resident Assistant (RA)</p>
+        {ra.building && (
+          <p className="text-[10px] font-bold text-brand uppercase mt-0.5 tracking-wider">{ra.building}</p>
+        )}
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-2">
+        {ra.email && (
+          <a
+            href={`mailto:${ra.email}`}
+            title="Email RA"
+            className="w-8 h-8 rounded-full bg-white hover:bg-brand-light hover:text-brand flex items-center justify-center text-gray-400 transition-colors border border-gray-100 shadow-sm"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </a>
+        )}
+      </div>
+    </Card>
   )
 }

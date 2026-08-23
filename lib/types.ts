@@ -24,6 +24,7 @@ export interface Student {
   suite: string | null
   room: string | null
   bed: string | null
+  is_ra?: boolean
 }
 
 
@@ -147,5 +148,15 @@ export interface CafeteriaInfo {
   announcement: string | null
   image_url: string | null
   updated_at: string
+}
+
+export interface CalendarEntry {
+  id: string
+  title: string
+  description: string | null
+  start_date: string
+  end_date: string | null
+  category: 'academic' | 'holiday' | 'deadline' | 'housing' | 'registration'
+  created_at: string
 }
 

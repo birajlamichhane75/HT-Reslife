@@ -4,7 +4,7 @@ import StudentManager from '@/components/admin/StudentManager'
 export const revalidate = 0
 
 export default async function AdminStudentsPage() {
-  const supabase = createServerSupabaseClient()
+  const supabase = createServiceRoleClient()
   const { data: students, error } = await supabase
     .from('students')
     .select('*')

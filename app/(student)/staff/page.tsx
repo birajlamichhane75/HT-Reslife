@@ -19,8 +19,27 @@ export default async function StaffDirectoryPage() {
     console.error('Error fetching staff directory:', error)
   }
 
+  // Fetch Resident Assistants (RAs) from students table
+  let ras: any[] = []
+  try {
+    const { data: raData, error: raError } = await supabase
+      .from('students')
+      .select('id, full_name, email, building, suite, room, bed, is_ra')
+      .eq('is_ra', true)
+      .eq('is_active', true)
+      .order('full_name', { ascending: true })
+
+    if (raError) {
+      console.warn('Could not fetch RAs (column is_ra may need to be added to database):', raError.message)
+    } else if (raData) {
+      ras = raData
+    }
+  } catch (err) {
+    console.error('Error fetching RAs:', err)
+  }
+
   return (
-    <div className="p-5 flex flex-col gap-5">
+    <div className="p-5 flex flex-col gap-5 text-left">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
@@ -38,7 +57,7 @@ export default async function StaffDirectoryPage() {
       </div>
 
       {/* Staff search and listings container */}
-      <StaffList initialStaff={staff || []} />
+      <StaffList initialStaff={staff || []} initialRas={ras} />
     </div>
   )
 }
