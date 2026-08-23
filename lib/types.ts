@@ -14,7 +14,18 @@ export interface Student {
   is_active: boolean
   push_subscription: object | null
   created_at: string
+  student_id: string | null
+  first_name: string | null
+  last_name: string | null
+  session: string | null
+  cohort: string | null
+  application_status: string | null
+  building: string | null
+  suite: string | null
+  room: string | null
+  bed: string | null
 }
+
 
 export interface Announcement {
   id: string
