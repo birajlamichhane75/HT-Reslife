@@ -154,7 +154,7 @@ export default function AdminStaffPage() {
         {!showForm ? (
           <Button onClick={handleAddClick}>Add Staff Member</Button>
         ) : (
-          <Button variant="outline" onClick={handleCancelClick}>Close Editor</Button>
+          <Button variant="secondary" onClick={handleCancelClick}>Close Editor</Button>
         )}
       </div>
 
@@ -222,7 +222,7 @@ export default function AdminStaffPage() {
           />
 
           <div className="flex gap-3">
-            <Button variant="outline" type="button" onClick={handleCancelClick} className="flex-1">
+            <Button variant="secondary" type="button" onClick={handleCancelClick} className="flex-1">
               Cancel
             </Button>
             <Button type="submit" disabled={submitting} className="flex-1">
