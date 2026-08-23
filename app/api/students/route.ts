@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         // If already registered, fetch the user ID
         if (authError.message.includes('already registered') || authError.message.includes('already been registered')) {
           const { data: { users } } = await serviceSupabase.auth.admin.listUsers()
-          const existingUser = users.find(u => u.email?.toLowerCase() === trimmedEmail)
+          const existingUser = users.find((u: any) => u.email?.toLowerCase() === trimmedEmail)
           if (existingUser) {
             userId = existingUser.id
           } else {
