@@ -179,7 +179,7 @@ export default function AdminCalendarPage() {
         {!showForm ? (
           <Button onClick={handleAddClick}>Add Calendar Event</Button>
         ) : (
-          <Button variant="outline" onClick={handleCancelClick}>Close Editor</Button>
+          <Button variant="secondary" onClick={handleCancelClick}>Close Editor</Button>
         )}
       </div>
 
@@ -240,7 +240,7 @@ export default function AdminCalendarPage() {
           </div>
 
           <div className="flex gap-3">
-            <Button variant="outline" type="button" onClick={handleCancelClick} className="flex-1">
+            <Button variant="secondary" type="button" onClick={handleCancelClick} className="flex-1">
               Cancel
             </Button>
             <Button type="submit" disabled={submitting} className="flex-1">
