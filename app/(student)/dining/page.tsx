@@ -259,191 +259,39 @@ export default function StudentDiningPage() {
         </div>
       </div>
 
-      {/* Section 3 — Weekly Menu (7-day tab strip) */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h3 className="font-display font-semibold text-gray-900 text-sm">Weekly Dining Menus</h3>
-          <p className="text-xs text-gray-500">Choose a day to see menu listings</p>
-        </div>
+      {/* Section 3 — Weekly Menu Coming Soon */}
+      <div className="flex flex-col gap-3">
+        <h3 className="font-display font-semibold text-gray-900 text-sm">Weekly Dining Menus</h3>
+        <div className="bg-gradient-to-br from-[#660100] to-[#3B0000] rounded-2xl p-8 text-center shadow-lg border border-[#660100]/20 relative overflow-hidden flex flex-col items-center gap-4 group">
+          {/* Decorative backdrop gradients */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#FFCC00]/5 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
 
-        {/* Tab strip */}
-        <div className="flex gap-1.5 overflow-x-auto pb-1.5 scrollbar-thin scrollbar-thumb-gray-200">
-          {DAYS_OF_WEEK.map((day, idx) => {
-            const isSelected = selectedDayIndex === idx
-            const dayData = weeklyDays[idx]
-            const isToday = dayData?.date === todayDateStr
-            
-            return (
-              <button
-                key={day.shortName}
-                onClick={() => setSelectedDayIndex(idx)}
-                className={`flex-shrink-0 px-4 py-3 rounded-xl border flex flex-col items-center gap-0.5 min-w-[56px] transition-all ${
-                  isSelected 
-                    ? 'bg-brand border-brand text-white shadow-sm font-bold' 
-                    : 'bg-white border-[#E5E8EF] text-gray-700 hover:border-gray-300 font-semibold'
-                }`}
-              >
-                <span className="text-[10px] uppercase opacity-75">{day.shortName}</span>
-                <span className="text-sm leading-none">{dayData?.date ? new Date(dayData.date + 'T00:00:00').getDate() : ''}</span>
-                {isToday && (
-                  <span className={`w-1 h-1 rounded-full mt-1 ${isSelected ? 'bg-white' : 'bg-brand'}`}></span>
-                )}
-              </button>
-            )
-          })}
-        </div>
+          {/* Cloche SVG Icon Container */}
+          <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-300">
+            <svg className="w-10 h-10 text-[#FFCC00]" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2m0 0a7 7 0 017 7v1H5v-1a7 7 0 017-7zm-9 10h18a1 1 0 011 1v1a1 1 0 01-1 1H3a1 1 0 01-1-1v-1a1 1 0 011-1zm9-12a1 1 0 100-2 1 1 0 000 2z" />
+            </svg>
+          </div>
 
-        {/* Selected Day Meals Grid */}
-        <div className="flex flex-col gap-5 mt-2">
-          {selectedDayData?.meals.length === 0 ? (
-            <div className="bg-white border border-[#E5E8EF] p-12 rounded-2xl text-center text-xs text-gray-400">
-              No meals scheduled for this day.
-            </div>
-          ) : (
-            selectedDayData?.meals.map((meal: any) => {
-              const matchingHour = hours.find(
-                h => h.day_type === (selectedDayIndex === 5 ? 'saturday' : selectedDayIndex === 6 ? 'sunday' : 'weekday') && h.meal_slot === meal.slot
-              )
-              const isActiveNow = isSelectedDayToday && isPeriodActive(todayDayType, meal.slot)
+          {/* Update Badge */}
+          <span className="px-3 py-1 bg-[#FFCC00]/15 border border-[#FFCC00]/35 text-[#FFCC00] rounded-full text-[10px] font-bold uppercase tracking-wider">
+            Menu Update
+          </span>
 
-              return (
-                <div 
-                  key={meal.slot}
-                  className={`bg-white border rounded-2xl shadow-sm overflow-hidden transition-all ${
-                    isActiveNow ? 'border-green-300 ring-1 ring-green-100 shadow-md' : 'border-[#E5E8EF]'
-                  }`}
-                >
-                  {/* Meal Slot Header */}
-                  <div className={`px-5 py-4 border-b flex justify-between items-center ${
-                    isActiveNow ? 'bg-green-50/40 border-green-100' : 'bg-gray-50/50 border-[#E5E8EF]'
-                  }`}>
-                    <div className="flex flex-col gap-0.5">
-                      <h4 className="font-bold text-sm text-gray-900 capitalize font-display flex items-center gap-2">
-                        {meal.slot}
-                        {isActiveNow && (
-                          <Badge variant="success" className="px-1.5 py-0.5 text-[9px] uppercase font-bold tracking-wider border-green-200">
-                            Serving Now
-                          </Badge>
-                        )}
-                      </h4>
-                      <span className="text-xs text-gray-500 font-medium">
-                        {matchingHour ? `${matchingHour.open_time} - ${matchingHour.close_time}` : 'Hours not set'}
-                      </span>
-                    </div>
-                    {meal.source === 'daily_override' && (
-                      <Badge variant="info" className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider">
-                        Special Menu
-                      </Badge>
-                    )}
-                  </div>
+          {/* Message */}
+          <div className="flex flex-col gap-2 max-w-sm">
+            <h3 className="font-display font-bold text-white text-base">Weekly Menu Coming Soon</h3>
+            <p className="text-xs text-white/80 font-medium leading-relaxed">
+              Our culinary team is updating the meal plans for the upcoming week. The complete schedule with breakfast, lunch, and dinner menus will be available here soon.
+            </p>
+          </div>
 
-                  {/* Cancelled Banner */}
-                  {meal.is_cancelled ? (
-                    <div className="p-6 text-center bg-red-50/50 flex flex-col items-center justify-center gap-2">
-                      <span className="text-2xl">🚫</span>
-                      <h5 className="font-bold text-red-800 text-sm">Meal Period Cancelled</h5>
-                      {meal.cancel_reason && (
-                        <p className="text-xs text-red-600 max-w-md">{meal.cancel_reason}</p>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      {/* Special Note Banner */}
-                      {meal.special_note && (
-                        <div className="px-5 py-3 bg-teal-50 border-b border-teal-100 text-teal-800 text-xs font-semibold flex gap-2 items-center">
-                          <span>✨</span>
-                          <span>{meal.special_note}</span>
-                        </div>
-                      )}
+          <div className="w-16 h-0.5 rounded-full bg-[#FFCC00]/80 mt-1"></div>
 
-                      {/* Items Grid */}
-                      {meal.items.length === 0 ? (
-                        <div className="p-8 text-center text-xs text-gray-400">
-                          Menu items are not announced yet.
-                        </div>
-                      ) : (
-                        <div className="p-5 grid grid-cols-2 gap-4">
-                          {meal.items.map((item: MenuItem, itemIdx: number) => {
-                            const imageUrl = getItemImage(item.name)
-                            const catStyle = getCategoryStyle(item.category)
-
-                            return (
-                              <div 
-                                key={itemIdx} 
-                                className="border border-gray-100 rounded-xl overflow-hidden flex flex-col hover:border-gray-200 hover:shadow-sm transition-all"
-                              >
-                                {/* Item Image or Icon Box */}
-                                <div className="h-28 w-full relative bg-gray-50 flex items-center justify-center">
-                                  {imageUrl ? (
-                                    <img 
-                                      src={imageUrl} 
-                                      alt={item.name} 
-                                      className="w-full h-full object-cover" 
-                                    />
-                                  ) : (
-                                    <div className={`w-full h-full flex flex-col items-center justify-center border-b ${catStyle.bg}`}>
-                                      <span className="text-3xl mb-1">{catStyle.icon}</span>
-                                      <span className="text-[9px] uppercase tracking-wider font-bold opacity-75">{item.category || 'Food'}</span>
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* Item Info */}
-                                <div className="p-3 flex flex-col flex-1 gap-2 justify-between">
-                                  <div className="flex flex-col gap-1">
-                                    <h5 className="font-bold text-xs text-gray-900 leading-snug line-clamp-1">
-                                      {item.name}
-                                    </h5>
-                                    {item.description && (
-                                      <p className="text-[10px] text-gray-500 leading-normal line-clamp-2">
-                                        {item.description}
-                                      </p>
-                                    )}
-                                  </div>
-
-                                  <div className="flex flex-col gap-1.5 pt-1 border-t border-gray-50">
-                                    {/* Diet Badges */}
-                                    <div className="flex gap-1 flex-wrap">
-                                      {item.is_vegetarian && (
-                                        <span className="px-1.5 py-0.5 rounded bg-green-50 text-green-700 border border-green-100 font-bold text-[8px]">
-                                          V
-                                        </span>
-                                      )}
-                                      {item.is_vegan && (
-                                        <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-100 font-bold text-[8px]">
-                                          VG
-                                        </span>
-                                      )}
-                                      {item.is_halal && (
-                                        <span className="px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-100 font-bold text-[8px]">
-                                          H
-                                        </span>
-                                      )}
-                                    </div>
-
-                                    {/* Allergens warning */}
-                                    {item.allergens && item.allergens.length > 0 && (
-                                      <div className="text-[9px] text-amber-700 font-medium flex items-center gap-1">
-                                        <span>⚠️</span>
-                                        <span className="line-clamp-1 italic">
-                                          Contains: {item.allergens.join(', ')}
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              )
-            })
-          )}
+          <p className="text-[10px] text-white/60 font-semibold italic">
+            Please refer to the standard operating hours listed below in the meantime.
+          </p>
         </div>
       </div>
 
