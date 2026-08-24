@@ -5,10 +5,10 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const response = NextResponse.next()
 
-  // Skip middleware logic for static assets and public folder files
   if (
     pathname.includes('.') ||
-    pathname.startsWith('/_next')
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/_')
   ) {
     return response
   }

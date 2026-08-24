@@ -110,12 +110,24 @@ export default async function StudentDashboard() {
       ),
     },
     {
-      label: 'Housing Apply',
-      href: '#',
+      label: 'eRezLife Portal',
+      href: 'https://htu.erezlife.com/',
       bg: 'bg-rose-50/50 border-rose-100 hover:border-rose-300 text-rose-700',
       icon: (
         <svg className="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Instagram',
+      href: 'https://www.instagram.com/htreslife/',
+      bg: 'bg-pink-50/50 border-pink-100 hover:border-pink-300 text-pink-700',
+      icon: (
+        <svg className="w-5 h-5 text-pink-650" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+          <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
         </svg>
       ),
     },
@@ -158,16 +170,26 @@ export default async function StudentDashboard() {
       <div>
         <h3 className="font-display font-semibold text-gray-900 text-sm mb-3">Quick Actions</h3>
         <div className="grid grid-cols-2 gap-3.5">
-          {QUICK_ACTIONS.map((action) => (
-            <Link key={action.label} href={action.href}>
-              <div className={`p-4 rounded-xl border flex flex-col gap-3 items-start transition-all duration-200 shadow-sm active:scale-[0.98] ${action.bg}`}>
-                <div className="p-1.5 bg-white rounded-lg border border-inherit shadow-sm">
-                  {action.icon}
+          {QUICK_ACTIONS.map((action, index) => {
+            const isExternal = action.href.startsWith('http')
+            const isLastOdd = index === QUICK_ACTIONS.length - 1 && QUICK_ACTIONS.length % 2 !== 0
+            
+            return (
+              <Link 
+                key={action.label} 
+                href={action.href}
+                className={isLastOdd ? 'col-span-2' : ''}
+                {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                <div className={`p-4 rounded-xl border flex flex-col gap-3 items-start transition-all duration-200 shadow-sm active:scale-[0.98] ${action.bg}`}>
+                  <div className="p-1.5 bg-white rounded-lg border border-inherit shadow-sm">
+                    {action.icon}
+                  </div>
+                  <span className="text-xs font-semibold leading-tight">{action.label}</span>
                 </div>
-                <span className="text-xs font-semibold leading-tight">{action.label}</span>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
       </div>
 

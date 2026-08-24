@@ -70,6 +70,26 @@ const STUDENT_SIDEBAR_ITEMS = [
       </svg>
     ),
   },
+  {
+    label: 'eRezLife Portal',
+    href: 'https://htu.erezlife.com/',
+    icon: (active: boolean) => (
+      <svg className="w-5 h-5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 2.25 : 1.75}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/htreslife/',
+    icon: (active: boolean) => (
+      <svg className="w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" strokeWidth={active ? 2.25 : 1.75} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+        <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+      </svg>
+    ),
+  },
 ]
 
 export default function StudentSidebar({
@@ -116,6 +136,7 @@ export default function StudentSidebar({
         <nav className="flex flex-col gap-1">
           {STUDENT_SIDEBAR_ITEMS.map((item) => {
             const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+            const isExternal = item.href.startsWith('http')
             return (
               <Link
                 key={item.label}
@@ -126,6 +147,7 @@ export default function StudentSidebar({
                     ? 'bg-brand-light text-brand font-bold'
                     : 'text-gray-500 hover:text-gray-950 hover:bg-gray-50'
                 )}
+                {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               >
                 <div className={clsx(
                   'transition-transform duration-200 flex-shrink-0',
