@@ -56,6 +56,18 @@ const admins = [
     fullName: 'Yemisi Obalade',
     // Strong unique password
     password: 'Obalade_Admin_HTU2026!#z'
+  },
+  {
+    email: 'reslife@htu.edu',
+    fullName: 'Office of Residence Life',
+    // Strong unique password
+    password: 'Reslife_Admin_HTU2026!#a'
+  },
+  {
+    email: 'biancabell@htu.edu',
+    fullName: 'Bianca Bell',
+    // Strong unique password
+    password: 'Bell_Admin_HTU2026!#b'
   }
 ];
 
