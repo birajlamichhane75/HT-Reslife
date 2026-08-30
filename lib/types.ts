@@ -160,3 +160,14 @@ export interface CalendarEntry {
   created_at: string
 }
 
+export interface FormItem {
+  id: string
+  title: string
+  description: string | null
+  url: string | null
+  is_erezlife: boolean
+  sort_order: number
+  created_at: string
+}
+
+

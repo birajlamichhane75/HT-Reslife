@@ -40,114 +40,103 @@ export default async function StudentDashboard() {
 
   const QUICK_ACTIONS = [
     {
-      label: 'Maintenance',
+      label: 'My Housing',
+      href: '/profile',
+      bg: 'bg-[#660100]/5 border-[#660100]/15 hover:border-[#660100]/35 text-[#660100]',
+      icon: (
+        <svg className="w-5 h-5 text-[#660100]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      ),
+    },
+    {
+      label: 'eRezLife',
+      href: '/erezlife',
+      bg: 'bg-[#FFCC00]/10 border-[#FFCC00]/25 hover:border-[#FFCC00]/45 text-[#660100]',
+      icon: (
+        <svg className="w-5 h-5 text-[#660100]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Room Assessments',
+      href: '/room-assessments',
+      bg: 'bg-[#660100]/5 border-[#660100]/15 hover:border-[#660100]/35 text-[#660100]',
+      icon: (
+        <svg className="w-5 h-5 text-[#660100]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Guest Check-In',
+      href: '/guest-check-in',
+      bg: 'bg-[#FFCC00]/10 border-[#FFCC00]/25 hover:border-[#FFCC00]/45 text-[#660100]',
+      icon: (
+        <svg className="w-5 h-5 text-[#660100]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Maintenance Requests',
       href: '/maintenance',
-      bg: 'bg-orange-50/50 border-orange-100 hover:border-orange-300 text-orange-700',
+      bg: 'bg-[#660100]/5 border-[#660100]/15 hover:border-[#660100]/35 text-[#660100]',
       icon: (
-        <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        <svg className="w-5 h-5 text-[#660100]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       ),
     },
     {
-      label: 'Events',
-      href: '/events',
-      bg: 'bg-green-50/50 border-green-100 hover:border-green-300 text-green-700',
+      label: 'Report a Concern',
+      href: '/report-concern',
+      bg: 'bg-[#FFCC00]/10 border-[#FFCC00]/25 hover:border-[#FFCC00]/45 text-[#660100]',
       icon: (
-        <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <svg className="w-5 h-5 text-[#660100]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
       ),
     },
     {
-      label: 'Staff Directory',
+      label: 'Forms & Requests',
+      href: '/forms',
+      bg: 'bg-[#660100]/5 border-[#660100]/15 hover:border-[#660100]/35 text-[#660100]',
+      icon: (
+        <svg className="w-5 h-5 text-[#660100]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Contact My RHC',
       href: '/staff',
-      bg: 'bg-blue-50/50 border-blue-100 hover:border-blue-300 text-blue-700',
+      bg: 'bg-[#FFCC00]/10 border-[#FFCC00]/25 hover:border-[#FFCC00]/45 text-[#660100]',
       icon: (
-        <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        <svg className="w-5 h-5 text-[#660100]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
         </svg>
       ),
     },
     {
-      label: 'Campus Map',
-      href: '/map',
-      bg: 'bg-purple-50/50 border-purple-100 hover:border-purple-300 text-purple-700',
+      label: 'Residence Life Handbook',
+      href: '/handbooks',
+      bg: 'bg-[#660100]/5 border-[#660100]/15 hover:border-[#660100]/35 text-[#660100]',
       icon: (
-        <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-        </svg>
-      ),
-    },
-    {
-      label: 'Updates',
-      href: '/announcements',
-      bg: 'bg-indigo-50/50 border-indigo-100 hover:border-indigo-300 text-indigo-700',
-      icon: (
-        <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-      ),
-    },
-    {
-      label: 'FAQ Accordion',
-      href: '/faq',
-      bg: 'bg-pink-50/50 border-pink-100 hover:border-pink-300 text-pink-700',
-      icon: (
-        <svg className="w-5 h-5 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-    },
-    {
-      label: 'Move-in Checklist',
-      href: '/movein',
-      bg: 'bg-teal-50/50 border-teal-100 hover:border-teal-300 text-teal-700',
-      icon: (
-        <svg className="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      ),
-    },
-    {
-      label: 'eRezLife Portal',
-      href: 'https://htu.erezlife.com/',
-      bg: 'bg-rose-50/50 border-rose-100 hover:border-rose-300 text-rose-700',
-      icon: (
-        <svg className="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        </svg>
-      ),
-    },
-    {
-      label: 'Instagram',
-      href: 'https://www.instagram.com/htreslife/',
-      bg: 'bg-pink-50/50 border-pink-100 hover:border-pink-300 text-pink-700',
-      icon: (
-        <svg className="w-5 h-5 text-pink-650" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-          <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-        </svg>
-      ),
-    },
-    {
-      label: 'Campus Dining',
-      href: '/dining',
-      bg: 'bg-amber-50/50 border-amber-100 hover:border-amber-300 text-amber-700',
-      icon: (
-        <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="w-5 h-5 text-[#660100]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
       ),
     },
     {
-      label: 'Academic Calendar',
-      href: '/calendar',
-      bg: 'bg-emerald-50/50 border-emerald-100 hover:border-emerald-300 text-emerald-700',
+      label: 'Emergency/Safety Info',
+      href: '/resources/emergency',
+      bg: 'bg-red-50 border-red-100 hover:border-red-300 text-red-750',
       icon: (
-        <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="w-5 h-5 text-red-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
       ),
     },
@@ -169,16 +158,14 @@ export default async function StudentDashboard() {
       {/* Quick Action Grid */}
       <div>
         <h3 className="font-display font-semibold text-gray-900 text-sm mb-3">Quick Actions</h3>
-        <div className="grid grid-cols-2 gap-3.5">
-          {QUICK_ACTIONS.map((action, index) => {
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+          {QUICK_ACTIONS.map((action) => {
             const isExternal = action.href.startsWith('http')
-            const isLastOdd = index === QUICK_ACTIONS.length - 1 && QUICK_ACTIONS.length % 2 !== 0
             
             return (
               <Link 
                 key={action.label} 
                 href={action.href}
-                className={isLastOdd ? 'col-span-2' : ''}
                 {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               >
                 <div className={`p-4 rounded-xl border flex flex-col gap-3 items-start transition-all duration-200 shadow-sm active:scale-[0.98] ${action.bg}`}>
