@@ -12,6 +12,9 @@ import {
   MenuItem, 
   MealImage 
 } from '@/lib/types'
+import { CafeteriaChatbot } from '@/components/dining/CafeteriaChatbot'
+import { CafeteriaCycleBrowser } from '@/components/dining/CafeteriaCycleBrowser'
+import { calculateCycleWeek, JS_DAY_TO_NAME } from '@/lib/dining/cafeteria-data'
 
 // Helper: Convert "7:00 AM" to minutes since midnight
 function timeToMinutes(timeStr: string): number {
@@ -259,40 +262,16 @@ export default function StudentDiningPage() {
         </div>
       </div>
 
-      {/* Section 3 — Weekly Menu Coming Soon */}
-      <div className="flex flex-col gap-3">
-        <h3 className="font-display font-semibold text-gray-900 text-sm">Weekly Dining Menus</h3>
-        <div className="bg-gradient-to-br from-[#660100] to-[#3B0000] rounded-2xl p-8 text-center shadow-lg border border-[#660100]/20 relative overflow-hidden flex flex-col items-center gap-4 group">
-          {/* Decorative backdrop gradients */}
-          <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"></div>
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#FFCC00]/5 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+      {/* Section 3 — Cafeteria AI Agent & 4-Week Cycle Menu */}
+      <div className="flex flex-col gap-6">
+        {/* Interactive AI Chatbot */}
+        <CafeteriaChatbot
+          currentWeek={calculateCycleWeek(new Date())}
+          currentDay={JS_DAY_TO_NAME[new Date().getDay()] || 'Thursday'}
+        />
 
-          {/* Cloche SVG Icon Container */}
-          <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-inner group-hover:scale-105 transition-transform duration-300">
-            <svg className="w-10 h-10 text-[#FFCC00]" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2m0 0a7 7 0 017 7v1H5v-1a7 7 0 017-7zm-9 10h18a1 1 0 011 1v1a1 1 0 01-1 1H3a1 1 0 01-1-1v-1a1 1 0 011-1zm9-12a1 1 0 100-2 1 1 0 000 2z" />
-            </svg>
-          </div>
-
-          {/* Update Badge */}
-          <span className="px-3 py-1 bg-[#FFCC00]/15 border border-[#FFCC00]/35 text-[#FFCC00] rounded-full text-[10px] font-bold uppercase tracking-wider">
-            Menu Update
-          </span>
-
-          {/* Message */}
-          <div className="flex flex-col gap-2 max-w-sm">
-            <h3 className="font-display font-bold text-white text-base">Weekly Menu Coming Soon</h3>
-            <p className="text-xs text-white/80 font-medium leading-relaxed">
-              Our culinary team is updating the meal plans for the upcoming week. The complete schedule with breakfast, lunch, and dinner menus will be available here soon.
-            </p>
-          </div>
-
-          <div className="w-16 h-0.5 rounded-full bg-[#FFCC00]/80 mt-1"></div>
-
-          <p className="text-[10px] text-white/60 font-semibold italic">
-            Please refer to the standard operating hours listed below in the meantime.
-          </p>
-        </div>
+        {/* 4-Week Cycle Menu Schedule Browser */}
+        <CafeteriaCycleBrowser />
       </div>
 
       {/* Section 4 — Cafeteria Hours Table */}
