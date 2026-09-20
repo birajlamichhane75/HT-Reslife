@@ -1,5 +1,5 @@
 // Cafeteria AI Agent Core Engine
-// Implements strict 17 rules from system prompt with 0-hallucination guarantee
+// Formats responses using exact Calendar Month, Date, and Day (no "Week 1", "Week 2" in student output)
 
 import { 
   CAFETERIA_28_DAY_MENU, 
@@ -8,7 +8,10 @@ import {
   DayOfWeekName,
   getMenuForDay,
   calculateCycleWeek,
-  JS_DAY_TO_NAME
+  JS_DAY_TO_NAME,
+  formatDateMonthDay,
+  getPrecedingThursday,
+  formatMonthDayRange
 } from './cafeteria-data'
 
 export interface AgentInput {
@@ -23,21 +26,9 @@ export interface AgentResponse {
   answer: string
   week_number: number
   day_of_week: DayOfWeekName
+  formatted_date: string
   meal_context?: string
   suggestions?: string[]
-}
-
-// Next menu day resolver
-function getNextMenuDay(weekNum: number, dayName: DayOfWeekName): { nextWeek: number; nextDay: DayOfWeekName } {
-  const currentIndex = CAFETERIA_CYCLE_DAYS.findIndex(
-    d => d.toLowerCase() === dayName.toLowerCase()
-  )
-  if (currentIndex === -1 || currentIndex === CAFETERIA_CYCLE_DAYS.length - 1) {
-    // Wrap to next week Thursday
-    const nextW = weekNum === 4 ? 1 : weekNum + 1
-    return { nextWeek: nextW, nextDay: 'Thursday' }
-  }
-  return { nextWeek: weekNum, nextDay: CAFETERIA_CYCLE_DAYS[currentIndex + 1] }
 }
 
 // Format serving time string
@@ -68,7 +59,6 @@ function isStrictlyVegetarian(itemName: string): boolean {
     'zucchini',
     'stuffed squash'
   ]
-  // Must contain an explicit term, and NOT contain obvious meats unless prepended by 'meatless' / 'vegan'
   const isExcludedMeat = (lower.includes('chicken') && !lower.includes('meatless chicken')) ||
                          (lower.includes('beef') && !lower.includes('meatless beef') && !lower.includes('vegan beef')) ||
                          lower.includes('pork') ||
@@ -89,18 +79,15 @@ function isStrictlyVegetarian(itemName: string): boolean {
 
 export class CafeteriaAgent {
   /**
-   * Process a student's question and generate response adhering strictly to rules
+   * Process a student's question and generate response with exact month, date, and day
    */
   public static async processMessage(input: AgentInput): Promise<AgentResponse> {
-    const today = new Date()
+    const today = input.current_date ? new Date(input.current_date + 'T12:00:00') : new Date()
     const currentDayName = (input.current_day || JS_DAY_TO_NAME[today.getDay()] || 'Thursday') as DayOfWeekName
-    const currentWeekNum = input.current_week || calculateCycleWeek(today)
     const mealTimes = input.meal_times || null
     const question = input.user_question.trim()
 
-    // 1. Check if an external LLM API key exists (optional enhancement)
-    // If not, our rule engine provides 100% exact compliance.
-    return this.evaluateWithRules(question, currentWeekNum, currentDayName, mealTimes)
+    return this.evaluateWithRules(question, today, currentDayName, mealTimes)
   }
 
   /**
@@ -108,115 +95,139 @@ export class CafeteriaAgent {
    */
   private static evaluateWithRules(
     question: string,
-    currentWeekNum: number,
+    today: Date,
     currentDayName: DayOfWeekName,
     mealTimes?: Record<string, { start: string; end: string } | null> | null
   ): AgentResponse {
     const qLower = question.toLowerCase()
 
-    // A. Parse target week & day
-    let targetWeek = currentWeekNum
-    let targetDay = currentDayName
-    let dayContextSpecified = false
-
-    // Explicit week check: "week 1", "week 2", "week 3", "week 4"
-    const weekMatch = qLower.match(/week\s*([1-4])/i)
-    if (weekMatch) {
-      targetWeek = parseInt(weekMatch[1], 10) as 1 | 2 | 3 | 4
-      dayContextSpecified = true
-    }
-
-    // Explicit day check: "thursday", "friday", "saturday", "sunday", "monday", "tuesday", "wednesday"
-    for (const d of CAFETERIA_CYCLE_DAYS) {
-      const regex = new RegExp(`\\b${d.toLowerCase()}\\b`, 'i')
-      if (regex.test(qLower)) {
-        targetDay = d
-        dayContextSpecified = true
-        break
-      }
-    }
+    // 1. Resolve Target Date & Day
+    const targetDate = new Date(today)
+    targetDate.setHours(0, 0, 0, 0)
+    let isToday = true
+    let isTomorrow = false
 
     // Relative day: "tomorrow"
     if (qLower.includes('tomorrow')) {
-      const next = getNextMenuDay(currentWeekNum, currentDayName)
-      targetWeek = next.nextWeek
-      targetDay = next.nextDay
-      dayContextSpecified = true
-    }
-
-    // Relative day: "yesterday"
-    if (qLower.includes('today')) {
-      targetWeek = currentWeekNum
-      targetDay = currentDayName
-    }
-
-    // Fetch the menu for target week and day
-    const menu = getMenuForDay(targetWeek, targetDay)
-    if (!menu) {
-      return {
-        answer: `Menu information for Week ${targetWeek} ${targetDay} is not available in the 28-day cycle.`,
-        week_number: targetWeek,
-        day_of_week: targetDay
+      targetDate.setDate(targetDate.getDate() + 1)
+      isToday = false
+      isTomorrow = true
+    } else {
+      // Check if a specific day name is requested e.g. "friday", "monday"
+      for (const d of CAFETERIA_CYCLE_DAYS) {
+        const regex = new RegExp(`\\b${d.toLowerCase()}\\b`, 'i')
+        if (regex.test(qLower)) {
+          // Find the upcoming date for this day of week from today
+          const currentJsDay = today.getDay()
+          const targetJsDay = Object.entries(JS_DAY_TO_NAME).find(
+            ([_, name]) => name.toLowerCase() === d.toLowerCase()
+          )
+          if (targetJsDay) {
+            const targetNum = parseInt(targetJsDay[0], 10)
+            let diff = targetNum - currentJsDay
+            if (diff < 0) diff += 7
+            if (diff === 0 && !qLower.includes('today')) {
+              // Same day of week mentioned
+            }
+            targetDate.setDate(today.getDate() + diff)
+            isToday = diff === 0
+            isTomorrow = diff === 1
+          }
+          break
+        }
       }
     }
 
-    // B. Check for Vegetarian query (Rule 8)
-    if (qLower.includes('vegetarian') || qLower.includes('vegan') || qLower.includes('meatless')) {
-      return this.handleVegetarianQuery(menu, targetWeek, targetDay)
+    // Explicit week check: "week 1", "week 2", "week 3", "week 4" (if user asks e.g. "Week 2 Tuesday")
+    let targetWeek: 1 | 2 | 3 | 4 = calculateCycleWeek(targetDate)
+    const weekMatch = qLower.match(/week\s*([1-4])/i)
+    if (weekMatch) {
+      targetWeek = parseInt(weekMatch[1], 10) as 1 | 2 | 3 | 4
+      // Advance targetDate to that cycle week's occurrence
+      const currentCycleWeek = calculateCycleWeek(today)
+      const weekDiff = (targetWeek - currentCycleWeek + 4) % 4
+      if (weekDiff > 0) {
+        targetDate.setDate(targetDate.getDate() + weekDiff * 7)
+        isToday = false
+        isTomorrow = false
+      }
     }
 
-    // C. Check for specific food search (Rule 7, e.g. "is chicken being served", "is there pizza")
-    const searchResult = this.handleFoodSearchQuery(qLower, menu, targetWeek, targetDay)
+    const targetDayName = (JS_DAY_TO_NAME[targetDate.getDay()] || 'Thursday') as DayOfWeekName
+    const formattedDate = formatDateMonthDay(targetDate)
+
+    // Fetch menu
+    const menu = getMenuForDay(targetWeek, targetDayName)
+    if (!menu) {
+      return {
+        answer: `Menu information for ${formattedDate} is not available.`,
+        week_number: targetWeek,
+        day_of_week: targetDayName,
+        formatted_date: formattedDate
+      }
+    }
+
+    // 2. Check for Vegetarian query (Rule 8)
+    if (qLower.includes('vegetarian') || qLower.includes('vegan') || qLower.includes('meatless')) {
+      return this.handleVegetarianQuery(menu, targetWeek, targetDayName, formattedDate, isToday)
+    }
+
+    // 3. Check for specific food search (Rule 7, e.g. "is chicken being served", "is there pizza")
+    const searchResult = this.handleFoodSearchQuery(qLower, menu, targetWeek, targetDayName, formattedDate, isToday)
     if (searchResult) {
       return searchResult
     }
 
-    // D. Check for specific meal slot queries (Rule 6)
-    // Soup query
+    // 4. Check for specific meal slot queries (Rule 6)
     if (qLower.includes('soup') || qLower.includes('chowder') || qLower.includes('gumbo') || qLower.includes('chili')) {
-      return this.handleSoupQuery(menu, targetWeek, targetDay)
+      return this.handleSoupQuery(menu, targetWeek, targetDayName, formattedDate, isToday)
     }
 
-    // Grill Station query
     if (qLower.includes('grill') || qLower.includes('grill station') || qLower.includes('burger') || qLower.includes('fries')) {
-      return this.handleGrillStationQuery(menu, targetWeek, targetDay, mealTimes)
+      return this.handleGrillStationQuery(menu, targetWeek, targetDayName, formattedDate, mealTimes)
     }
 
-    // Breakfast / Brunch query
     if (qLower.includes('breakfast') || qLower.includes('brunch')) {
-      return this.handleBreakfastQuery(menu, targetWeek, targetDay, mealTimes)
+      return this.handleBreakfastQuery(menu, targetWeek, targetDayName, formattedDate, isToday, mealTimes)
     }
 
-    // Lunch query
     if (qLower.includes('lunch')) {
-      return this.handleLunchQuery(menu, targetWeek, targetDay, mealTimes)
+      return this.handleLunchQuery(menu, targetWeek, targetDayName, formattedDate, isToday, mealTimes)
     }
 
-    // Dinner query
     if (qLower.includes('dinner')) {
-      return this.handleDinnerQuery(menu, targetWeek, targetDay, mealTimes)
+      return this.handleDinnerQuery(menu, targetWeek, targetDayName, formattedDate, isToday, mealTimes)
     }
 
-    // This week overview query
+    // Weekly overview query
     if (qLower.includes('this week') || qLower.includes('weekly')) {
-      return this.handleWeeklyOverview(targetWeek)
+      return this.handleWeeklyOverview(today, targetWeek)
     }
 
-    // Default: "What is being served today?" or general day menu query
-    return this.handleFullDayMenu(menu, targetWeek, targetDay, mealTimes)
+    // Default: full day menu
+    return this.handleFullDayMenu(menu, targetWeek, targetDayName, formattedDate, isToday, isTomorrow, mealTimes)
   }
 
   /**
-   * Handler for Full Day Menu ("What is being served today?")
+   * Handler for Full Day Menu
    */
   private static handleFullDayMenu(
     menu: DailyMenuCycle,
     week: number,
     day: DayOfWeekName,
+    formattedDate: string,
+    isToday: boolean,
+    isTomorrow: boolean,
     mealTimes?: Record<string, { start: string; end: string } | null> | null
   ): AgentResponse {
     const lines: string[] = []
-    lines.push(`Today is Week ${week} ${day}.`)
+    if (isToday) {
+      lines.push(`Today is ${formattedDate}.`)
+    } else if (isTomorrow) {
+      lines.push(`Tomorrow is ${formattedDate}.`)
+    } else {
+      lines.push(`Menu for ${formattedDate}:`)
+    }
     lines.push('')
 
     // Breakfast or Brunch
@@ -233,7 +244,7 @@ export class CafeteriaAgent {
     menu.lunch_items.forEach(item => lines.push(`• ${item}`))
     lines.push('')
 
-    // Dinner (Check Rule 12 for missing data)
+    // Dinner
     lines.push('Dinner')
     if (menu.dinner_items === null || menu.dinner_items.length === 0) {
       lines.push('The menu does not list the dinner items for this day.')
@@ -258,7 +269,6 @@ export class CafeteriaAgent {
       lines.push('')
     }
 
-    // Rule 13 serving time notice if no times were configured
     const hasAnyTime = !!(
       getServingTimeStr('breakfast', mealTimes) ||
       getServingTimeStr('lunch', mealTimes) ||
@@ -272,6 +282,7 @@ export class CafeteriaAgent {
       answer: lines.join('\n').trim(),
       week_number: week,
       day_of_week: day,
+      formatted_date: formattedDate,
       suggestions: ["What's for lunch?", "What's at the Grill Station?", "Today's soup", "Vegetarian options"]
     }
   }
@@ -283,12 +294,20 @@ export class CafeteriaAgent {
     menu: DailyMenuCycle,
     week: number,
     day: DayOfWeekName,
+    formattedDate: string,
+    isToday: boolean,
     mealTimes?: Record<string, { start: string; end: string } | null> | null
   ): AgentResponse {
     const lines: string[] = []
-    lines.push(`Today is Week ${week} ${day}.`)
-    lines.push('')
-    lines.push('Lunch:')
+    if (isToday) {
+      lines.push(`Today is ${formattedDate}.`)
+      lines.push('')
+      lines.push('Lunch:')
+    } else {
+      lines.push(`${formattedDate} Lunch:`)
+      lines.push('')
+    }
+
     const lTime = getServingTimeStr('lunch', mealTimes)
     if (lTime) {
       lines.push(lTime)
@@ -305,6 +324,7 @@ export class CafeteriaAgent {
       answer: lines.join('\n').trim(),
       week_number: week,
       day_of_week: day,
+      formatted_date: formattedDate,
       meal_context: 'Lunch',
       suggestions: ["What's for dinner?", "What's at the Grill Station?", "What soup is available?"]
     }
@@ -317,19 +337,27 @@ export class CafeteriaAgent {
     menu: DailyMenuCycle,
     week: number,
     day: DayOfWeekName,
+    formattedDate: string,
+    isToday: boolean,
     mealTimes?: Record<string, { start: string; end: string } | null> | null
   ): AgentResponse {
     const lines: string[] = []
-    lines.push(`Week ${week} ${day} Dinner:`)
-    lines.push('')
+    if (isToday) {
+      lines.push(`Today is ${formattedDate}.`)
+      lines.push('')
+      lines.push('Dinner:')
+    } else {
+      lines.push(`${formattedDate} Dinner:`)
+      lines.push('')
+    }
 
-    // Rule 12: Missing data check
     if (menu.dinner_items === null || menu.dinner_items.length === 0) {
       lines.push('The menu does not list the dinner items for this day.')
       return {
         answer: lines.join('\n').trim(),
         week_number: week,
         day_of_week: day,
+        formatted_date: formattedDate,
         meal_context: 'Dinner',
         suggestions: ["What's at the Grill Station?", "What soup is available?", "What's for lunch?"]
       }
@@ -351,24 +379,33 @@ export class CafeteriaAgent {
       answer: lines.join('\n').trim(),
       week_number: week,
       day_of_week: day,
+      formatted_date: formattedDate,
       meal_context: 'Dinner',
       suggestions: ["What's for lunch?", "What's at the Grill Station?"]
     }
   }
 
   /**
-   * Handler for Breakfast / Brunch (Rule 3: do not call Brunch Breakfast)
+   * Handler for Breakfast / Brunch
    */
   private static handleBreakfastQuery(
     menu: DailyMenuCycle,
     week: number,
     day: DayOfWeekName,
+    formattedDate: string,
+    isToday: boolean,
     mealTimes?: Record<string, { start: string; end: string } | null> | null
   ): AgentResponse {
     const lines: string[] = []
-    lines.push(`Today is Week ${week} ${day}.`)
-    lines.push('')
-    lines.push(`${menu.breakfast_type}:`)
+    if (isToday) {
+      lines.push(`Today is ${formattedDate}.`)
+      lines.push('')
+      lines.push(`${menu.breakfast_type}:`)
+    } else {
+      lines.push(`${formattedDate} ${menu.breakfast_type}:`)
+      lines.push('')
+    }
+
     const bTime = getServingTimeStr(menu.breakfast_type.toLowerCase() as any, mealTimes)
     if (bTime) {
       lines.push(bTime)
@@ -385,45 +422,52 @@ export class CafeteriaAgent {
       answer: lines.join('\n').trim(),
       week_number: week,
       day_of_week: day,
+      formatted_date: formattedDate,
       meal_context: menu.breakfast_type,
       suggestions: ["What's for lunch?", "What's for dinner?"]
     }
   }
 
   /**
-   * Handler for Soup (Rule 3 & 6)
+   * Handler for Soup
    */
   private static handleSoupQuery(
     menu: DailyMenuCycle,
     week: number,
-    day: DayOfWeekName
+    day: DayOfWeekName,
+    formattedDate: string,
+    isToday: boolean
   ): AgentResponse {
     if (!menu.soup) {
       return {
-        answer: `There is no soup listed on the menu for Week ${week} ${day}.`,
+        answer: `There is no soup listed on the menu for ${formattedDate}.`,
         week_number: week,
         day_of_week: day,
+        formatted_date: formattedDate,
         meal_context: 'Soup',
         suggestions: ["What's for lunch?", "What's at the Grill Station?"]
       }
     }
 
+    const header = isToday ? "Today's soup is:" : `${formattedDate} soup:`
     return {
-      answer: `Today's soup is:\n\n• ${menu.soup}`,
+      answer: `${header}\n\n• ${menu.soup}`,
       week_number: week,
       day_of_week: day,
+      formatted_date: formattedDate,
       meal_context: 'Soup',
       suggestions: ["What's for lunch?", "What's for dinner?", "What's at the Grill Station?"]
     }
   }
 
   /**
-   * Handler for Grill Station (Rule 3 & 6)
+   * Handler for Grill Station
    */
   private static handleGrillStationQuery(
     menu: DailyMenuCycle,
     week: number,
     day: DayOfWeekName,
+    formattedDate: string,
     mealTimes?: Record<string, { start: string; end: string } | null> | null
   ): AgentResponse {
     const lines: string[] = []
@@ -434,18 +478,21 @@ export class CafeteriaAgent {
       answer: lines.join('\n').trim(),
       week_number: week,
       day_of_week: day,
+      formatted_date: formattedDate,
       meal_context: 'Grill Station',
       suggestions: ["Is there pizza today?", "What's for lunch?", "What soup is available?"]
     }
   }
 
   /**
-   * Handler for Vegetarian options (Rule 8: strict vegetarian labeling)
+   * Handler for Vegetarian options
    */
   private static handleVegetarianQuery(
     menu: DailyMenuCycle,
     week: number,
-    day: DayOfWeekName
+    day: DayOfWeekName,
+    formattedDate: string,
+    isToday: boolean
   ): AgentResponse {
     const lines: string[] = []
     const vegBreakfast = menu.breakfast_items.filter(isStrictlyVegetarian)
@@ -458,14 +505,16 @@ export class CafeteriaAgent {
 
     if (!hasAny) {
       return {
-        answer: `There are no items explicitly labeled or identified as vegetarian for Week ${week} ${day}.`,
+        answer: `There are no items explicitly labeled or identified as vegetarian for ${formattedDate}.`,
         week_number: week,
         day_of_week: day,
+        formatted_date: formattedDate,
         suggestions: ["What's for lunch?", "What's at the Grill Station?"]
       }
     }
 
-    lines.push(`Vegetarian options for Week ${week} ${day}:`)
+    const title = isToday ? 'Vegetarian options for today:' : `Vegetarian options for ${formattedDate}:`
+    lines.push(title)
     lines.push('')
 
     if (vegBreakfast.length > 0) {
@@ -502,49 +551,28 @@ export class CafeteriaAgent {
       answer: lines.join('\n').trim(),
       week_number: week,
       day_of_week: day,
+      formatted_date: formattedDate,
       suggestions: ["What's for lunch?", "What soup is available?"]
     }
   }
 
   /**
-   * Handler for Specific Food Search (Rule 7: search complete menu for item)
+   * Handler for Food Search
    */
   private static handleFoodSearchQuery(
     question: string,
     menu: DailyMenuCycle,
     week: number,
-    day: DayOfWeekName
+    day: DayOfWeekName,
+    formattedDate: string,
+    isToday: boolean
   ): AgentResponse | null {
-    // List of searchable keywords/foods
     const foodKeywords = [
-      'pizza',
-      'chicken',
-      'fish',
-      'catfish',
-      'tilapia',
-      'salmon',
-      'beef',
-      'pork',
-      'taco',
-      'tacos',
-      'shrimp',
-      'turkey',
-      'burger',
-      'burgers',
-      'fries',
-      'french fries',
-      'pasta',
-      'lasagna',
-      'wings',
-      'wing bar',
-      'rice',
-      'ribs',
-      'egg rolls',
-      'po boy',
-      'sub',
-      'sandwich',
-      'philly',
-      'cornbread'
+      'pizza', 'chicken', 'fish', 'catfish', 'tilapia', 'salmon',
+      'beef', 'pork', 'taco', 'tacos', 'shrimp', 'turkey',
+      'burger', 'burgers', 'fries', 'french fries', 'pasta', 'lasagna',
+      'wings', 'wing bar', 'rice', 'ribs', 'egg rolls', 'po boy',
+      'sub', 'sandwich', 'philly', 'cornbread'
     ]
 
     let matchedKeyword: string | null = null
@@ -558,8 +586,6 @@ export class CafeteriaAgent {
 
     if (!matchedKeyword) return null
 
-    // Pizza special handling matching prompt example in Section 16:
-    // User: "Is there pizza today?" -> "Yes. The Grill Station has: • Cheese Pizza • Pepperoni Pizza"
     if (matchedKeyword === 'pizza') {
       const pizzaItems = menu.grill_station_items.filter(i => i.toLowerCase().includes('pizza'))
       if (pizzaItems.length > 0) {
@@ -569,19 +595,20 @@ export class CafeteriaAgent {
           answer: lines.join('\n').trim(),
           week_number: week,
           day_of_week: day,
+          formatted_date: formattedDate,
           meal_context: 'Grill Station',
           suggestions: ["What's at the Grill Station?", "What's for lunch?"]
         }
       } else {
         return {
-          answer: `No pizza is listed on the menu for Week ${week} ${day}.`,
+          answer: `No pizza is listed on the menu for ${formattedDate}.`,
           week_number: week,
-          day_of_week: day
+          day_of_week: day,
+          formatted_date: formattedDate
         }
       }
     }
 
-    // General food search across breakfast, lunch, dinner, soup, grill
     const kw = matchedKeyword.toLowerCase()
     const matchesBreakfast = menu.breakfast_items.filter(i => i.toLowerCase().includes(kw))
     const matchesLunch = menu.lunch_items.filter(i => i.toLowerCase().includes(kw))
@@ -593,17 +620,17 @@ export class CafeteriaAgent {
 
     if (totalMatches === 0) {
       return {
-        answer: `No, ${matchedKeyword} is not listed on the menu for Week ${week} ${day}.`,
+        answer: `No, ${matchedKeyword} is not listed on the menu for ${formattedDate}.`,
         week_number: week,
         day_of_week: day,
+        formatted_date: formattedDate,
         suggestions: ["What's being served today?", "What's for lunch?"]
       }
     }
 
-    // Capitalize keyword for response
     const capKw = matchedKeyword.charAt(0).toUpperCase() + matchedKeyword.slice(1)
     const lines: string[] = []
-    lines.push(`Yes. ${capKw} is available today.`)
+    lines.push(isToday ? `Yes. ${capKw} is available today.` : `Yes. ${capKw} is available on ${formattedDate}.`)
     lines.push('')
 
     if (matchesBreakfast.length > 0) {
@@ -640,22 +667,32 @@ export class CafeteriaAgent {
       answer: lines.join('\n').trim(),
       week_number: week,
       day_of_week: day,
+      formatted_date: formattedDate,
       suggestions: ["What's for lunch?", "What's for dinner?", "What's at the Grill Station?"]
     }
   }
 
   /**
-   * Handler for weekly overview
+   * Handler for weekly overview with calendar dates
    */
-  private static handleWeeklyOverview(week: number): AgentResponse {
+  private static handleWeeklyOverview(baseDate: Date, cycleWeekNum: number): AgentResponse {
+    const thursday = getPrecedingThursday(baseDate)
+    const wednesday = new Date(thursday)
+    wednesday.setDate(thursday.getDate() + 6)
+    const rangeLabel = formatMonthDayRange(thursday, wednesday)
+
     const lines: string[] = []
-    lines.push(`Here is the menu schedule for Week ${week} (Thursday through Wednesday):`)
+    lines.push(`Here is the menu schedule for This Week (${rangeLabel}):`)
     lines.push('')
 
-    CAFETERIA_CYCLE_DAYS.forEach(day => {
-      const menu = getMenuForDay(week, day)
+    CAFETERIA_CYCLE_DAYS.forEach((day, idx) => {
+      const dayDate = new Date(thursday)
+      dayDate.setDate(thursday.getDate() + idx)
+      const dayFormatted = formatDateMonthDay(dayDate)
+
+      const menu = getMenuForDay(cycleWeekNum, day)
       if (menu) {
-        lines.push(`**${day}**`)
+        lines.push(`**${dayFormatted}**`)
         lines.push(`• Lunch: ${menu.lunch_items.slice(0, 3).join(', ')}...`)
         if (menu.dinner_items && menu.dinner_items.length > 0) {
           lines.push(`• Dinner: ${menu.dinner_items.slice(0, 3).join(', ')}...`)
@@ -668,8 +705,9 @@ export class CafeteriaAgent {
 
     return {
       answer: lines.join('\n').trim(),
-      week_number: week,
+      week_number: cycleWeekNum,
       day_of_week: 'Thursday',
+      formatted_date: rangeLabel,
       suggestions: ["What's for lunch today?", "What's at the Grill Station?"]
     }
   }

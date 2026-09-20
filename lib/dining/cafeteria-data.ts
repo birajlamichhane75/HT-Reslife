@@ -1031,3 +1031,159 @@ export function getMenuForDay(weekNumber: number, dayOfWeek: DayOfWeekName): Dai
     (m) => m.week_number === weekNumber && m.day_of_week.toLowerCase() === dayOfWeek.toLowerCase()
   )
 }
+
+/**
+ * Returns the Thursday starting the current 7-day cycle period for a given date
+ */
+export function getPrecedingThursday(refDate: Date = new Date()): Date {
+  const d = new Date(refDate)
+  d.setHours(0, 0, 0, 0)
+  const jsDay = d.getDay() // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  const daysSinceThursday = (jsDay - 4 + 7) % 7
+  d.setDate(d.getDate() - daysSinceThursday)
+  return d
+}
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+]
+
+const MONTH_SHORT = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+]
+
+/**
+ * Formats date as e.g. "Sunday, September 20"
+ */
+export function formatDateMonthDay(date: Date): string {
+  const dayName = JS_DAY_TO_NAME[date.getDay()]
+  const monthName = MONTH_NAMES[date.getMonth()]
+  return `${dayName}, ${monthName} ${date.getDate()}`
+}
+
+/**
+ * Formats date as e.g. "Sun, Sep 20"
+ */
+export function formatDateShort(date: Date): string {
+  const dayShort = (JS_DAY_TO_NAME[date.getDay()] || '').slice(0, 3)
+  const monthShort = MONTH_SHORT[date.getMonth()]
+  return `${dayShort}, ${monthShort} ${date.getDate()}`
+}
+
+/**
+ * Formats date as e.g. "Sunday, September 20, 2026"
+ */
+export function formatDateLong(date: Date): string {
+  const dayName = JS_DAY_TO_NAME[date.getDay()]
+  const monthName = MONTH_NAMES[date.getMonth()]
+  return `${dayName}, ${monthName} ${date.getDate()}, ${date.getFullYear()}`
+}
+
+/**
+ * Formats date range as e.g. "Sep 17 – 23" or "Sep 24 – Oct 1"
+ */
+export function formatMonthDayRange(start: Date, end: Date): string {
+  const startMonth = MONTH_SHORT[start.getMonth()]
+  const endMonth = MONTH_SHORT[end.getMonth()]
+  if (startMonth === endMonth) {
+    return `${startMonth} ${start.getDate()} – ${end.getDate()}`
+  }
+  return `${startMonth} ${start.getDate()} – ${endMonth} ${end.getDate()}`
+}
+
+export interface CycleDayInfo {
+  name: DayOfWeekName
+  date: Date
+  dateStr: string // "2026-09-20"
+  shortLabel: string // "Sun, Sep 20"
+  fullLabel: string // "Sunday, September 20"
+  isToday: boolean
+}
+
+export interface CycleWeekPeriod {
+  index: number // 0, 1, 2, 3
+  cycleWeekNumber: 1 | 2 | 3 | 4
+  startDate: Date
+  endDate: Date
+  label: string // e.g. "This Week (Sep 17 – 23)" or "Next Week (Sep 24 – 30)"
+  isCurrentPeriod: boolean
+  days: CycleDayInfo[]
+}
+
+/**
+ * Returns 4 consecutive 7-day cycle periods starting from the current Thursday,
+ * mapped to exact calendar dates.
+ */
+export function getCyclePeriods(baseDate: Date = new Date()): CycleWeekPeriod[] {
+  const baseThursday = getPrecedingThursday(baseDate)
+  const todayStr = new Date(baseDate).toISOString().split('T')[0]
+  const periods: CycleWeekPeriod[] = []
+
+  for (let i = 0; i < 4; i++) {
+    const periodThursday = new Date(baseThursday)
+    periodThursday.setDate(baseThursday.getDate() + i * 7)
+
+    const periodWednesday = new Date(periodThursday)
+    periodWednesday.setDate(periodThursday.getDate() + 6)
+
+    const cycleWeekNum = calculateCycleWeek(periodThursday)
+    const rangeLabel = formatMonthDayRange(periodThursday, periodWednesday)
+    let periodTitle = rangeLabel
+    if (i === 0) {
+      periodTitle = `This Week (${rangeLabel})`
+    } else if (i === 1) {
+      periodTitle = `Next Week (${rangeLabel})`
+    }
+
+    const days: CycleDayInfo[] = []
+    CAFETERIA_CYCLE_DAYS.forEach((dayName, dayOffset) => {
+      const dayDate = new Date(periodThursday)
+      dayDate.setDate(periodThursday.getDate() + dayOffset)
+      const dStr = dayDate.toISOString().split('T')[0]
+
+      days.push({
+        name: dayName,
+        date: dayDate,
+        dateStr: dStr,
+        shortLabel: formatDateShort(dayDate),
+        fullLabel: formatDateMonthDay(dayDate),
+        isToday: dStr === todayStr
+      })
+    })
+
+    periods.push({
+      index: i,
+      cycleWeekNumber: cycleWeekNum,
+      startDate: periodThursday,
+      endDate: periodWednesday,
+      label: periodTitle,
+      isCurrentPeriod: i === 0,
+      days
+    })
+  }
+
+  return periods
+}
+
+/**
+ * Looks up the menu for any given calendar date
+ */
+export function getMenuForCalendarDate(date: Date = new Date()): {
+  menu: DailyMenuCycle | undefined
+  date: Date
+  dayName: DayOfWeekName
+  formattedDate: string
+} {
+  const dayName = (JS_DAY_TO_NAME[date.getDay()] || 'Thursday') as DayOfWeekName
+  const cycleWeekNum = calculateCycleWeek(date)
+  const menu = getMenuForDay(cycleWeekNum, dayName)
+  return {
+    menu,
+    date,
+    dayName,
+    formattedDate: formatDateMonthDay(date)
+  }
+}
+

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
+import { formatDateMonthDay } from '@/lib/dining/cafeteria-data'
 
 interface Message {
   id: string
@@ -11,8 +12,9 @@ interface Message {
 }
 
 interface CafeteriaChatbotProps {
-  currentWeek: number
-  currentDay: string
+  currentWeek?: number
+  currentDay?: string
+  todayDate?: Date
   className?: string
   defaultOpen?: boolean
 }
@@ -20,14 +22,17 @@ interface CafeteriaChatbotProps {
 export function CafeteriaChatbot({
   currentWeek,
   currentDay,
+  todayDate = new Date(),
   className = '',
   defaultOpen = true
 }: CafeteriaChatbotProps) {
+  const formattedToday = formatDateMonthDay(todayDate)
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
       sender: 'assistant',
-      text: `👋 Hello! I'm your **Ram Dining Assistant**.\n\nToday is **Week ${currentWeek} ${currentDay}**.\n\nAsk me anything about today's meals, upcoming days, dietary options, or specific stations!`,
+      text: `👋 Hello! I'm your **Ram Dining Assistant**.\n\nToday is **${formattedToday}**.\n\nAsk me anything about today's meals, upcoming dates, dietary options, or specific stations!`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       suggestions: [
         "What's for lunch today?",
@@ -179,7 +184,7 @@ export function CafeteriaChatbot({
               </span>
             </div>
             <p className="text-[11px] text-white/75 font-medium">
-              Cycle Week {currentWeek} • {currentDay} • 28-Day Menu
+              {formattedToday} • HTU Union Cafeteria
             </p>
           </div>
         </div>
