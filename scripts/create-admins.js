@@ -68,6 +68,14 @@ const admins = [
     fullName: 'Bianca Bell',
     // Strong unique password
     password: 'Bell_Admin_HTU2026!#b'
+  },
+  {
+    email: 'rantwi@htu.edu',
+    fullName: 'Richard Antwi',
+    role: 'Residence Hall Coordinator – Teresa Hall',
+    hall: 'Teresa Hall',
+    phone: '(828) 283-9056',
+    password: 'Antwi_Admin_HTU2026!#t'
   }
 ];
 
