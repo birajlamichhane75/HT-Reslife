@@ -5,7 +5,6 @@ import HeroCard from '@/components/features/HeroCard'
 import NotifBanner from '@/components/features/NotifBanner'
 import AnnouncementCard from '@/components/features/AnnouncementCard'
 import ThanksgivingBanner from '@/components/features/ThanksgivingBanner'
-import { THANKSGIVING_BREAK_FORM } from '@/lib/constants'
 
 export const revalidate = 0
 
@@ -39,6 +38,10 @@ export default async function StudentDashboard() {
   }
   const announcements = announcementsRes.data || []
   const openTicketsCount = ticketsCountRes.count || 0
+
+  const hasThanksgivingAnnouncement = announcements.some(
+    (a) => a.title.toLowerCase().includes('thanksgiving') || a.body.toLowerCase().includes('thanksgiving')
+  )
 
   const QUICK_ACTIONS = [
     {
@@ -144,10 +147,6 @@ export default async function StudentDashboard() {
     },
   ]
 
-  const otherAnnouncements = announcements.filter(
-    (ann) => !ann.title.toLowerCase().includes('thanksgiving break housing form')
-  )
-
   return (
     <div className="p-5 flex flex-col gap-6">
       {student && (
@@ -161,8 +160,8 @@ export default async function StudentDashboard() {
       {/* Push notifications and open tickets banner container */}
       <NotifBanner ticketCount={openTicketsCount} />
 
-      {/* Featured Seasonal Announcement Banner */}
-      <ThanksgivingBanner />
+      {/* Featured Seasonal Announcement Banner (synced with admin database) */}
+      {hasThanksgivingAnnouncement && <ThanksgivingBanner />}
 
       {/* Quick Action Grid */}
       <div>
@@ -189,7 +188,7 @@ export default async function StudentDashboard() {
         </div>
       </div>
 
-      {/* Latest Announcements */}
+      {/* Latest Announcements from Admin Database */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h3 className="font-display font-semibold text-gray-900 text-sm">Latest Updates</h3>
@@ -198,27 +197,22 @@ export default async function StudentDashboard() {
           </Link>
         </div>
 
-        <div className="flex flex-col gap-3.5">
-          {/* Pinned Seasonal Housing Notice */}
-          <AnnouncementCard
-            isPinned
-            actionUrl={THANKSGIVING_BREAK_FORM.url}
-            actionLabel="Complete Housing Form"
-            announcement={{
-              id: THANKSGIVING_BREAK_FORM.id,
-              title: THANKSGIVING_BREAK_FORM.title,
-              body:
-                'Residential students staying on campus during Thanksgiving Break (2026–2027) must submit the break housing form to register and ensure uninterrupted building access.',
-              priority: 'urgent',
-              created_by: 'Residence Life Office',
-              created_at: new Date().toISOString(),
-            }}
-          />
-
-          {otherAnnouncements.map((ann) => (
-            <AnnouncementCard key={ann.id} announcement={ann} />
-          ))}
-        </div>
+        {announcements.length === 0 ? (
+          <div className="bg-white border border-[#E5E8EF] p-8 rounded-2xl text-center text-xs text-gray-400">
+            No announcements posted yet.
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3.5">
+            {announcements.map((ann, index) => (
+              <AnnouncementCard
+                key={ann.id}
+                announcement={ann}
+                isPinned={index === 0 && ann.priority === 'urgent'}
+                defaultExpanded={index === 0 && ann.priority === 'urgent'}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

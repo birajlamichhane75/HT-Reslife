@@ -2,7 +2,6 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import AnnouncementCard from '@/components/features/AnnouncementCard'
-import { THANKSGIVING_BREAK_FORM } from '@/lib/constants'
 
 export const revalidate = 0
 
@@ -20,10 +19,8 @@ export default async function AnnouncementsPage() {
     console.error('Error fetching announcements:', error)
   }
 
-  // Filter out any duplicate if it happens to be in DB
-  const otherAnnouncements = (announcements || []).filter(
-    (ann) => !ann.title.toLowerCase().includes('thanksgiving break housing form')
-  )
+  const allAnnouncements = announcements || []
+  const firstUrgentIndex = allAnnouncements.findIndex((a) => a.priority === 'urgent')
 
   return (
     <div className="p-5 flex flex-col gap-5">
@@ -39,34 +36,30 @@ export default async function AnnouncementsPage() {
         </Link>
         <div>
           <h1 className="font-display font-semibold text-lg text-gray-900 leading-tight">Announcements</h1>
-          <p className="text-[10px] text-gray-400 font-medium">HT Housing Updates & Notifications</p>
+          <p className="text-[10px] text-gray-400 font-medium">HT Housing Updates & Notifications from Residence Life</p>
         </div>
       </div>
 
       {/* Announcements List */}
-      <div className="flex flex-col gap-4">
-        {/* Pinned Seasonal Housing Form */}
-        <AnnouncementCard
-          isPinned
-          defaultExpanded
-          actionUrl={THANKSGIVING_BREAK_FORM.url}
-          actionLabel="Complete Housing Form"
-          announcement={{
-            id: THANKSGIVING_BREAK_FORM.id,
-            title: THANKSGIVING_BREAK_FORM.title,
-            body:
-              'Residential students planning to stay on campus during any portion of Thanksgiving Break (2026–2027) are required to submit this registration form.\n\nPlease complete and submit your request to confirm your stay and ensure uninterrupted residence hall access and dining coordination.',
-            priority: 'urgent',
-            created_by: 'Residence Life & Housing Office',
-            created_at: new Date().toISOString(),
-          }}
-        />
-
-        {/* Other database announcements */}
-        {otherAnnouncements.map((ann) => (
-          <AnnouncementCard key={ann.id} announcement={ann} />
-        ))}
-      </div>
+      {allAnnouncements.length === 0 ? (
+        <div className="bg-white border border-[#E5E8EF] p-10 rounded-2xl text-center text-xs text-gray-450">
+          No announcements posted yet. Check back soon for updates.
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {allAnnouncements.map((ann, idx) => {
+            const isPinned = idx === firstUrgentIndex
+            return (
+              <AnnouncementCard
+                key={ann.id}
+                announcement={ann}
+                isPinned={isPinned}
+                defaultExpanded={isPinned}
+              />
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
