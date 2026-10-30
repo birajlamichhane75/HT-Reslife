@@ -40,7 +40,8 @@ INSERT INTO public.forms_directory (title, description, url, is_erezlife, sort_o
   ('Duty Processes & Logs', 'Submit duty logs, incident reports, and round logs (Authorized Staff only).', 'https://htu.erezlife.com/', true, 3),
 
   -- Housing Forms (is_erezlife = false)
-  ('Room Change Request Form', 'Request a room change or swap for the current academic semester.', 'https://htu.edu', false, 0),
-  ('Key Replacement Agreement', 'Acknowledge terms and fees for replacement of residence hall keys.', 'https://htu.edu', false, 1),
-  ('Liability & Property Damage Waiver', 'Standard release of liability and student property responsibility disclaimer.', 'https://htu.edu', false, 2),
-  ('Meal Plan Adjustment Request', 'Submit changes to your default student union meal plan tier.', 'https://htu.edu', false, 3);
+  ('Thanksgiving Break Housing Form 2026-2027', 'Submit your request for on-campus housing during Thanksgiving Break 2026-2027.', 'https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=vzYYjZZwDUSqDiwRBWtr1EOrooiwCthHqxLOeVFwjHNUNUdESUdLSkZIMExPMUIwR1pHVUgwMVc2Ni4u&origin=Invitation&channel=0', false, 0),
+  ('Room Change Request Form', 'Request a room change or swap for the current academic semester.', 'https://htu.edu', false, 1),
+  ('Key Replacement Agreement', 'Acknowledge terms and fees for replacement of residence hall keys.', 'https://htu.edu', false, 2),
+  ('Liability & Property Damage Waiver', 'Standard release of liability and student property responsibility disclaimer.', 'https://htu.edu', false, 3),
+  ('Meal Plan Adjustment Request', 'Submit changes to your default student union meal plan tier.', 'https://htu.edu', false, 4);

@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { FormItem } from '@/lib/types'
+import { THANKSGIVING_BREAK_FORM } from '@/lib/constants'
 
 export const revalidate = 0
 
@@ -9,12 +10,21 @@ const DEFAULT_FORM_FALLBACK_URL = 'https://htu.edu'
 
 const FALLBACK_FORMS: FormItem[] = [
   {
+    id: THANKSGIVING_BREAK_FORM.id,
+    title: THANKSGIVING_BREAK_FORM.title,
+    description: THANKSGIVING_BREAK_FORM.description,
+    url: THANKSGIVING_BREAK_FORM.url,
+    is_erezlife: false,
+    sort_order: 0,
+    created_at: new Date().toISOString()
+  },
+  {
     id: 'room-change',
     title: 'Room Change Request Form',
     description: 'Request a room change or swap for the current academic semester.',
     url: 'https://htu.edu',
     is_erezlife: false,
-    sort_order: 0,
+    sort_order: 1,
     created_at: new Date().toISOString()
   },
   {
@@ -23,7 +33,7 @@ const FALLBACK_FORMS: FormItem[] = [
     description: 'Acknowledge terms and fees for replacement of residence hall keys.',
     url: 'https://htu.edu',
     is_erezlife: false,
-    sort_order: 1,
+    sort_order: 2,
     created_at: new Date().toISOString()
   },
   {
@@ -32,7 +42,7 @@ const FALLBACK_FORMS: FormItem[] = [
     description: 'Standard release of liability and student property responsibility disclaimer.',
     url: 'https://htu.edu',
     is_erezlife: false,
-    sort_order: 2,
+    sort_order: 3,
     created_at: new Date().toISOString()
   },
   {
@@ -41,7 +51,7 @@ const FALLBACK_FORMS: FormItem[] = [
     description: 'Submit changes to your default student union meal plan tier.',
     url: 'https://htu.edu',
     is_erezlife: false,
-    sort_order: 3,
+    sort_order: 4,
     created_at: new Date().toISOString()
   }
 ]
@@ -62,7 +72,15 @@ export default async function FormsPage() {
     if (error || !data || data.length === 0) {
       forms = FALLBACK_FORMS
     } else {
-      forms = data
+      // Ensure the Thanksgiving break housing form is always prioritized at the top
+      const hasThanksgiving = data.some(
+        (f) => f.title.toLowerCase().includes('thanksgiving') || f.id === THANKSGIVING_BREAK_FORM.id
+      )
+      if (!hasThanksgiving) {
+        forms = [FALLBACK_FORMS[0], ...data]
+      } else {
+        forms = data
+      }
     }
   } catch (e) {
     forms = FALLBACK_FORMS
@@ -106,14 +124,28 @@ export default async function FormsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {forms.map((form) => {
             const destinationUrl = form.url && form.url.trim() !== '' ? form.url : DEFAULT_FORM_FALLBACK_URL
+            const isThanksgiving = form.title.toLowerCase().includes('thanksgiving') || form.id === THANKSGIVING_BREAK_FORM.id
             
             return (
               <div 
                 key={form.id} 
-                className="bg-white border border-[#E5E8EF] p-4 rounded-xl flex flex-col justify-between gap-3 shadow-sm hover:border-brand/20 transition-colors"
+                className={`bg-white border ${
+                  isThanksgiving 
+                    ? 'border-amber-300 ring-2 ring-amber-300/40 bg-gradient-to-br from-amber-50/30 to-white' 
+                    : 'border-[#E5E8EF]'
+                } p-4 rounded-xl flex flex-col justify-between gap-3 shadow-sm hover:border-brand/30 transition-all`}
               >
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-[10px] uppercase font-bold text-[#FFCC00] tracking-wider">Document</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-bold text-[#660100] tracking-wider">
+                      {isThanksgiving ? '🦃 Seasonal Form' : 'Document'}
+                    </span>
+                    {isThanksgiving && (
+                      <span className="text-[9px] uppercase font-bold text-[#660100] bg-[#FFCC00] px-2 py-0.5 rounded-full">
+                        Action Required
+                      </span>
+                    )}
+                  </div>
                   <h4 className="font-display font-bold text-gray-900 text-xs leading-tight">{form.title}</h4>
                   <p className="text-[10px] text-gray-400 font-semibold leading-relaxed">{form.description}</p>
                 </div>
@@ -121,7 +153,11 @@ export default async function FormsPage() {
                   href={destinationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full text-center py-2 bg-brand hover:bg-[#520100] text-white font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                  className={`w-full text-center py-2 ${
+                    isThanksgiving 
+                      ? 'bg-brand hover:bg-[#520100] text-white shadow-sm font-bold' 
+                      : 'bg-brand hover:bg-[#520100] text-white font-bold'
+                  } text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5`}
                 >
                   Access Form <span>↗</span>
                 </a>

@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import AnnouncementCard from '@/components/features/AnnouncementCard'
+import { THANKSGIVING_BREAK_FORM } from '@/lib/constants'
 
 export const revalidate = 0
 
@@ -18,6 +19,11 @@ export default async function AnnouncementsPage() {
   if (error) {
     console.error('Error fetching announcements:', error)
   }
+
+  // Filter out any duplicate if it happens to be in DB
+  const otherAnnouncements = (announcements || []).filter(
+    (ann) => !ann.title.toLowerCase().includes('thanksgiving break housing form')
+  )
 
   return (
     <div className="p-5 flex flex-col gap-5">
@@ -38,17 +44,29 @@ export default async function AnnouncementsPage() {
       </div>
 
       {/* Announcements List */}
-      {!announcements || announcements.length === 0 ? (
-        <div className="bg-white border border-[#E5E8EF] p-10 rounded-2xl text-center text-xs text-gray-400">
-          No announcements posted yet.
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {announcements.map((ann) => (
-            <AnnouncementCard key={ann.id} announcement={ann} />
-          ))}
-        </div>
-      )}
+      <div className="flex flex-col gap-4">
+        {/* Pinned Seasonal Housing Form */}
+        <AnnouncementCard
+          isPinned
+          defaultExpanded
+          actionUrl={THANKSGIVING_BREAK_FORM.url}
+          actionLabel="Complete Housing Form"
+          announcement={{
+            id: THANKSGIVING_BREAK_FORM.id,
+            title: THANKSGIVING_BREAK_FORM.title,
+            body:
+              'Residential students planning to stay on campus during any portion of Thanksgiving Break (2026–2027) are required to submit this registration form.\n\nPlease complete and submit your request to confirm your stay and ensure uninterrupted residence hall access and dining coordination.',
+            priority: 'urgent',
+            created_by: 'Residence Life & Housing Office',
+            created_at: new Date().toISOString(),
+          }}
+        />
+
+        {/* Other database announcements */}
+        {otherAnnouncements.map((ann) => (
+          <AnnouncementCard key={ann.id} announcement={ann} />
+        ))}
+      </div>
     </div>
   )
 }
