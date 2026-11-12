@@ -10,6 +10,8 @@ import { useToast } from '@/components/ui/Toast'
 import { Announcement } from '@/lib/types'
 import { Card } from '@/components/ui/Card'
 import { format } from 'date-fns'
+import ImageUploadField from '@/components/admin/ImageUploadField'
+import { parseImageFromText } from '@/lib/image-utils'
 
 export default function AnnouncementEditor({ onComplete }: { onComplete?: () => void }) {
   const router = useRouter()
@@ -17,6 +19,7 @@ export default function AnnouncementEditor({ onComplete }: { onComplete?: () => 
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [formUrl, setFormUrl] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [priority, setPriority] = useState('info')
   const [sendPush, setSendPush] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -41,7 +44,12 @@ export default function AnnouncementEditor({ onComplete }: { onComplete?: () => 
       const res = await fetch('/api/announcements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim(), body: finalBody, priority }),
+        body: JSON.stringify({
+          title: title.trim(),
+          body: finalBody,
+          priority,
+          image_url: imageUrl.trim() || null,
+        }),
       })
 
       if (!res.ok) {
@@ -73,6 +81,7 @@ export default function AnnouncementEditor({ onComplete }: { onComplete?: () => 
       setTitle('')
       setBody('')
       setFormUrl('')
+      setImageUrl('')
       setPriority('info')
       setSendPush(false)
 
@@ -91,7 +100,7 @@ export default function AnnouncementEditor({ onComplete }: { onComplete?: () => 
       
       <Input
         label="Title"
-        placeholder="e.g. Thanksgiving Break Housing Form or Halloween Reminder"
+        placeholder="e.g. Battle of the Halls or Thanksgiving Break Notice"
         required
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -114,6 +123,14 @@ export default function AnnouncementEditor({ onComplete }: { onComplete?: () => 
         required
         value={body}
         onChange={(e) => setBody(e.target.value)}
+      />
+
+      {/* Image / Flyer Upload */}
+      <ImageUploadField
+        value={imageUrl}
+        onChange={setImageUrl}
+        folder="announcements"
+        label="Announcement Flyer / Image (Stored in Supabase)"
       />
 
       <Input
@@ -192,7 +209,7 @@ export function AnnouncementManager({ initialAnnouncements }: { initialAnnouncem
       <div className="flex items-center justify-between border-b border-gray-150 pb-4">
         <div>
           <h1 className="font-display font-bold text-2xl text-gray-900 leading-tight">Announcements</h1>
-          <p className="text-xs text-gray-400 font-medium mt-0.5">Manage alerts, notices, and student forms from the admin side</p>
+          <p className="text-xs text-gray-400 font-medium mt-0.5">Manage alerts, notices, flyers, and student forms from the admin side</p>
         </div>
         <Button onClick={() => setShowForm(!showForm)}>
           {showForm ? 'Close Editor' : 'New Announcement'}
@@ -215,36 +232,58 @@ export function AnnouncementManager({ initialAnnouncements }: { initialAnnouncem
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {announcements.map((ann) => (
-              <Card key={ann.id} className="flex flex-col gap-2.5 relative group">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] font-semibold border px-2.5 py-0.5 rounded-full uppercase tracking-wider ${priorityBadgeColors[ann.priority] || priorityBadgeColors.info}`}>
-                      {ann.priority}
-                    </span>
-                    <span className="text-[10px] text-gray-400 font-medium">
-                      {format(new Date(ann.created_at), 'MMM d, yyyy • h:mm a')}
-                    </span>
-                  </div>
-                  
-                  {/* Delete button */}
-                  <button
-                    onClick={() => handleDelete(ann.id, ann.title)}
-                    disabled={deletingId === ann.id}
-                    className="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-2.5 py-1 rounded-md transition-colors flex items-center gap-1 font-medium"
-                    title="Delete announcement"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    <span>{deletingId === ann.id ? 'Deleting...' : 'Delete'}</span>
-                  </button>
-                </div>
+            {announcements.map((ann) => {
+              const { imageUrl, cleanText } = parseImageFromText(ann.image_url, ann.body)
 
-                <h3 className="font-display font-bold text-gray-900 text-sm leading-snug">{ann.title}</h3>
-                <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">{ann.body}</p>
-              </Card>
-            ))}
+              return (
+                <Card key={ann.id} className="flex flex-col gap-3 relative group">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] font-semibold border px-2.5 py-0.5 rounded-full uppercase tracking-wider ${priorityBadgeColors[ann.priority] || priorityBadgeColors.info}`}>
+                        {ann.priority}
+                      </span>
+                      {imageUrl && (
+                        <span className="text-[10px] font-semibold bg-brand-light/60 text-brand px-2 py-0.5 rounded-full flex items-center gap-1">
+                          🖼️ Flyer
+                        </span>
+                      )}
+                      <span className="text-[10px] text-gray-400 font-medium">
+                        {format(new Date(ann.created_at), 'MMM d, yyyy • h:mm a')}
+                      </span>
+                    </div>
+
+                    {/* Delete button */}
+                    <button
+                      onClick={() => handleDelete(ann.id, ann.title)}
+                      disabled={deletingId === ann.id}
+                      className="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-2.5 py-1 rounded-md transition-colors flex items-center gap-1 font-medium"
+                      title="Delete announcement"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      <span>{deletingId === ann.id ? 'Deleting...' : 'Delete'}</span>
+                    </button>
+                  </div>
+
+                  {/* Thumbnail / Flyer if present */}
+                  {imageUrl && (
+                    <div className="relative w-full max-h-48 rounded-xl overflow-hidden border border-gray-150 bg-gray-50 flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={imageUrl}
+                        alt={ann.title}
+                        className="w-full h-full object-cover max-h-48 cursor-pointer hover:opacity-95 transition-opacity"
+                        onClick={() => window.open(imageUrl, '_blank')}
+                      />
+                    </div>
+                  )}
+
+                  <h3 className="font-display font-bold text-gray-900 text-sm leading-snug">{ann.title}</h3>
+                  <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">{cleanText}</p>
+                </Card>
+              )
+            })}
           </div>
         )}
       </div>

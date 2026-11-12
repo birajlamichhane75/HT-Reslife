@@ -35,6 +35,7 @@ export interface Announcement {
   priority: Priority
   created_by: string
   created_at: string
+  image_url?: string | null
 }
 
 export interface MaintenanceTicket {
@@ -61,6 +62,7 @@ export interface Event {
   description: string | null
   created_by: string
   created_at: string
+  image_url?: string | null
 }
 
 export interface StaffMember {

@@ -9,22 +9,48 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { title, body, priority } = await req.json()
+    const { title, body, priority, image_url } = await req.json()
     if (!title || !body) {
       return NextResponse.json({ error: 'Missing title or body' }, { status: 400 })
     }
 
     const supabase = createServerSupabaseClient()
-    const { data, error } = await supabase
+    const cleanImageUrl = image_url && typeof image_url === 'string' ? image_url.trim() : null
+
+    const insertData: any = {
+      title,
+      body,
+      priority: priority || 'info',
+      created_by: admin.id,
+    }
+
+    if (cleanImageUrl) {
+      insertData.image_url = cleanImageUrl
+    }
+
+    let { data, error } = await supabase
       .from('announcements')
-      .insert({
-        title,
-        body,
-        priority: priority || 'info',
-        created_by: admin.id,
-      })
+      .insert(insertData)
       .select()
       .single()
+
+    // Graceful fallback if image_url column doesn't exist yet in Supabase schema
+    if (error && cleanImageUrl && (error.code === 'PGRST204' || error.message?.includes('image_url'))) {
+      const fallbackBody = `${body}\n\n[image: ${cleanImageUrl}]`
+      const retry = await supabase
+        .from('announcements')
+        .insert({
+          title,
+          body: fallbackBody,
+          priority: priority || 'info',
+          created_by: admin.id,
+        })
+        .select()
+        .single()
+
+      data = retry.data
+      error = retry.error
+    }
 
     if (error) throw error
 
