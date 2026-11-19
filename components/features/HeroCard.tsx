@@ -57,11 +57,11 @@ export default function HeroCard({
         {/* Quick shortcut pills */}
         <div className="flex items-center gap-2 pt-1 flex-wrap">
           <Link
-            href="/dining"
+            href="/announcements"
             className="text-[11px] font-semibold bg-white/15 hover:bg-white/25 text-white px-3 py-1 rounded-lg transition-colors flex items-center gap-1.5"
           >
-            <span>🍽️</span>
-            <span>Today's Dining Menu</span>
+            <span>📢</span>
+            <span>All Bulletins</span>
           </Link>
           <Link
             href="/maintenance"
@@ -71,11 +71,11 @@ export default function HeroCard({
             <span>Submit Maintenance</span>
           </Link>
           <Link
-            href="/announcements"
+            href="/forms"
             className="text-[11px] font-semibold bg-white/15 hover:bg-white/25 text-white px-3 py-1 rounded-lg transition-colors flex items-center gap-1.5"
           >
-            <span>📢</span>
-            <span>View All Notices</span>
+            <span>📑</span>
+            <span>Forms & Requests</span>
           </Link>
         </div>
       </div>

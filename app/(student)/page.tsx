@@ -5,8 +5,6 @@ import HeroCard from '@/components/features/HeroCard'
 import NotifBanner from '@/components/features/NotifBanner'
 import AnnouncementCard from '@/components/features/AnnouncementCard'
 import ThanksgivingBanner from '@/components/features/ThanksgivingBanner'
-import TodayDiningWidget from '@/components/dining/TodayDiningWidget'
-import { getMenuForCalendarDate, STANDARD_BREAKFAST_ITEMS } from '@/lib/dining/cafeteria-data'
 
 export const revalidate = 0
 
@@ -45,56 +43,12 @@ export default async function StudentDashboard() {
     (a) => a.title.toLowerCase().includes('thanksgiving') || a.body.toLowerCase().includes('thanksgiving')
   )
 
-  // Determine current meal & highlights for today's dining card
-  const now = new Date()
-  const currentHour = now.getHours()
-  let currentMealName = 'Breakfast'
-  let operatingHoursText = '7:30 AM – 9:00 AM'
-  let isOpen = false
-
-  if (currentHour < 10) {
-    currentMealName = 'Breakfast'
-    operatingHoursText = '7:30 AM – 9:00 AM'
-    isOpen = currentHour >= 7 && currentHour < 10
-  } else if (currentHour < 15) {
-    currentMealName = 'Lunch'
-    operatingHoursText = '11:00 AM – 1:30 PM'
-    isOpen = currentHour >= 11 && currentHour < 14
-  } else {
-    currentMealName = 'Dinner'
-    operatingHoursText = '5:00 PM – 7:00 PM'
-    isOpen = currentHour >= 17 && currentHour < 20
-  }
-
-  const { menu: todayMenu } = getMenuForCalendarDate(now)
-  let sampleDishes: string[] = []
-  if (todayMenu) {
-    if (currentMealName === 'Breakfast') {
-      sampleDishes = todayMenu.breakfast_items?.slice(0, 5) || STANDARD_BREAKFAST_ITEMS.slice(0, 5)
-    } else if (currentMealName === 'Lunch') {
-      sampleDishes = todayMenu.lunch_items?.slice(0, 5) || []
-    } else {
-      sampleDishes = todayMenu.dinner_items?.slice(0, 5) || todayMenu.lunch_items?.slice(0, 5) || []
-    }
-  }
-  if (!sampleDishes || sampleDishes.length === 0) {
-    sampleDishes = ['Omelet Station', 'Scrambled Eggs', 'Biscuits & Gravy', 'Fruit Salad']
-  }
-
-  // Modern categorized services
+  // Modern categorized services (Dining is kept in the dedicated Dining tab)
   const SERVICE_CATEGORIES = [
     {
       title: 'Daily Essentials',
       description: 'Frequently accessed campus living tools',
       items: [
-        {
-          label: 'Dining Station Menu',
-          subtitle: 'Grill, Homestyle, Salad & Bakery',
-          href: '/dining',
-          icon: '🍽️',
-          badge: 'Live',
-          badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        },
         {
           label: 'Notices & Bulletins',
           subtitle: 'Official announcements & flyers',
@@ -116,6 +70,12 @@ export default async function StudentDashboard() {
           icon: '🛠️',
           badge: openTicketsCount > 0 ? `${openTicketsCount} Active` : undefined,
           badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
+        },
+        {
+          label: 'Academic Calendar',
+          subtitle: 'Key university term dates & deadlines',
+          href: '/calendar',
+          icon: '📆',
         },
       ],
     },
@@ -202,14 +162,6 @@ export default async function StudentDashboard() {
       {/* Featured Seasonal Announcement Banner */}
       {hasThanksgivingAnnouncement && <ThanksgivingBanner />}
 
-      {/* Today's Dining Highlights (Matching reference aesthetic) */}
-      <TodayDiningWidget
-        currentMealName={currentMealName}
-        operatingHoursText={operatingHoursText}
-        isOpen={isOpen}
-        sampleItems={sampleDishes}
-      />
-
       {/* Categorized Services Directory */}
       <div className="flex flex-col gap-5">
         <div className="flex items-center justify-between">
@@ -218,7 +170,7 @@ export default async function StudentDashboard() {
               Resident Services & Hub
             </h2>
             <p className="text-xs text-gray-500 font-medium">
-              Quick access to dining, housing, forms, and student support
+              Quick access to housing, maintenance, forms, and student support
             </p>
           </div>
         </div>
