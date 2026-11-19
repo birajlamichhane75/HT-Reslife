@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { FormItem } from '@/lib/types'
 import { THANKSGIVING_BREAK_FORM } from '@/lib/constants'
+import FormsViewer from '@/components/features/FormsViewer'
 
 export const revalidate = 0
 
@@ -21,7 +22,7 @@ const FALLBACK_FORMS: FormItem[] = [
   {
     id: 'room-change',
     title: 'Room Change Request Form',
-    description: 'Request a room change or swap for the current academic semester.',
+    description: 'Request an official room reassignment or hall swap for the active semester.',
     url: 'https://htu.edu',
     is_erezlife: false,
     sort_order: 1,
@@ -29,8 +30,8 @@ const FALLBACK_FORMS: FormItem[] = [
   },
   {
     id: 'key-replace',
-    title: 'Key Replacement Agreement',
-    description: 'Acknowledge terms and fees for replacement of residence hall keys.',
+    title: 'Key Replacement & Lock Change Agreement',
+    description: 'Acknowledge terms and fees for replacement of lost residence hall keys or lock recore.',
     url: 'https://htu.edu',
     is_erezlife: false,
     sort_order: 2,
@@ -38,8 +39,8 @@ const FALLBACK_FORMS: FormItem[] = [
   },
   {
     id: 'liability',
-    title: 'Liability & Property Damage Waiver',
-    description: 'Standard release of liability and student property responsibility disclaimer.',
+    title: 'Liability & Student Property Damage Waiver',
+    description: 'Standard release of liability and resident personal property responsibility guidelines.',
     url: 'https://htu.edu',
     is_erezlife: false,
     sort_order: 3,
@@ -48,7 +49,7 @@ const FALLBACK_FORMS: FormItem[] = [
   {
     id: 'meal-plan',
     title: 'Meal Plan Adjustment Request',
-    description: 'Submit changes to your default student union meal plan tier.',
+    description: 'Submit tier changes or dietary accommodation requests for the cafeteria union meal plan.',
     url: 'https://htu.edu',
     is_erezlife: false,
     sort_order: 4,
@@ -72,7 +73,6 @@ export default async function FormsPage() {
     if (error || !data || data.length === 0) {
       forms = FALLBACK_FORMS
     } else {
-      // Ensure the Thanksgiving break housing form is always prioritized at the top
       const hasThanksgiving = data.some(
         (f) => f.title.toLowerCase().includes('thanksgiving') || f.id === THANKSGIVING_BREAK_FORM.id
       )
@@ -87,85 +87,29 @@ export default async function FormsPage() {
   }
 
   return (
-    <div className="p-5 flex flex-col gap-6">
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
           href="/"
-          className="p-1.5 text-gray-400 hover:text-brand hover:bg-gray-150/50 rounded-lg transition-all"
+          className="p-2 text-gray-500 hover:text-[#660100] bg-white hover:bg-gray-100 rounded-xl border border-gray-200 transition-all shadow-2xs"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
         <div>
-          <h1 className="font-display font-semibold text-lg text-gray-900 leading-tight">Forms & Requests</h1>
-          <p className="text-[10px] text-gray-400 font-medium">Housing forms, waivers, and releases</p>
+          <h1 className="font-display font-bold text-xl text-gray-900 leading-tight">
+            Forms & Requests Directory
+          </h1>
+          <p className="text-xs text-gray-500 font-medium">
+            Housing documentation, break stay applications, and eRezLife links
+          </p>
         </div>
       </div>
 
-      {/* Main explanation card */}
-      <div className="bg-white border border-[#E5E8EF] p-5 rounded-2xl shadow-sm flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <div className="text-xl">📝</div>
-          <div>
-            <h4 className="font-display font-bold text-gray-900 text-xs">HT Housing Forms Directory</h4>
-            <p className="text-[10px] text-gray-450 font-semibold">Access required residential paperwork online</p>
-          </div>
-        </div>
-        <p className="text-xs text-gray-500 font-medium leading-relaxed">
-          Please download and review the required forms below. Once completed, submit them to the Residential Life Office or your Residence Hall Coordinator. Fully digital workflow submissions are currently in integration.
-        </p>
-      </div>
-
-      {/* Forms Grid */}
-      <div className="flex flex-col gap-3">
-        <h3 className="font-display font-semibold text-gray-900 text-sm">Available Paperwork</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {forms.map((form) => {
-            const destinationUrl = form.url && form.url.trim() !== '' ? form.url : DEFAULT_FORM_FALLBACK_URL
-            const isThanksgiving = form.title.toLowerCase().includes('thanksgiving') || form.id === THANKSGIVING_BREAK_FORM.id
-            
-            return (
-              <div 
-                key={form.id} 
-                className={`bg-white border ${
-                  isThanksgiving 
-                    ? 'border-amber-300 ring-2 ring-amber-300/40 bg-gradient-to-br from-amber-50/30 to-white' 
-                    : 'border-[#E5E8EF]'
-                } p-4 rounded-xl flex flex-col justify-between gap-3 shadow-sm hover:border-brand/30 transition-all`}
-              >
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-bold text-[#660100] tracking-wider">
-                      {isThanksgiving ? '🦃 Seasonal Form' : 'Document'}
-                    </span>
-                    {isThanksgiving && (
-                      <span className="text-[9px] uppercase font-bold text-[#660100] bg-[#FFCC00] px-2 py-0.5 rounded-full">
-                        Action Required
-                      </span>
-                    )}
-                  </div>
-                  <h4 className="font-display font-bold text-gray-900 text-xs leading-tight">{form.title}</h4>
-                  <p className="text-[10px] text-gray-400 font-semibold leading-relaxed">{form.description}</p>
-                </div>
-                <a
-                  href={destinationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`w-full text-center py-2 ${
-                    isThanksgiving 
-                      ? 'bg-brand hover:bg-[#520100] text-white shadow-sm font-bold' 
-                      : 'bg-brand hover:bg-[#520100] text-white font-bold'
-                  } text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5`}
-                >
-                  Access Form <span>↗</span>
-                </a>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+      {/* Forms Viewer */}
+      <FormsViewer forms={forms} />
     </div>
   )
 }

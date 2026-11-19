@@ -30,7 +30,7 @@ export default async function StaffDirectoryPage() {
       .order('full_name', { ascending: true })
 
     if (raError) {
-      console.warn('Could not fetch RAs (column is_ra may need to be added to database):', raError.message)
+      console.warn('Could not fetch RAs:', raError.message)
     } else if (raData) {
       ras = raData
     }
@@ -39,20 +39,24 @@ export default async function StaffDirectoryPage() {
   }
 
   return (
-    <div className="p-5 flex flex-col gap-5 text-left">
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto flex flex-col gap-6 text-left">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
           href="/"
-          className="p-1.5 text-gray-400 hover:text-brand hover:bg-gray-150/50 rounded-lg transition-all"
+          className="p-2 text-gray-500 hover:text-[#660100] bg-white hover:bg-gray-100 rounded-xl border border-gray-200 transition-all shadow-2xs"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
         <div>
-          <h1 className="font-display font-semibold text-lg text-gray-900 leading-tight">Staff Directory</h1>
-          <p className="text-[10px] text-gray-400 font-medium">Contact your housing & RA support team</p>
+          <h1 className="font-display font-bold text-xl text-gray-900 leading-tight">
+            Housing & RA Staff Directory
+          </h1>
+          <p className="text-xs text-gray-500 font-medium">
+            Residence Hall Coordinators, Resident Assistants & Housing Leadership
+          </p>
         </div>
       </div>
 

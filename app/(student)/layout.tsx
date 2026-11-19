@@ -20,10 +20,9 @@ export default async function StudentLayout({
     .eq('id', session.user.id)
     .single()
 
-
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-[#FFFAEB] flex flex-col md:flex-row max-w-[430px] md:max-w-none mx-auto relative border-x border-gray-150/50 md:border-x-0 shadow-lg md:shadow-none">
+      <div className="min-h-screen bg-[#F8FAFC] text-gray-900 flex flex-col md:flex-row max-w-[430px] md:max-w-none mx-auto relative border-x border-gray-200 md:border-x-0 shadow-lg md:shadow-none antialiased">
         {/* Mobile Top Bar */}
         <div className="md:hidden flex-shrink-0">
           <TopBar studentName={student?.full_name ?? ''} />
@@ -37,8 +36,8 @@ export default async function StudentLayout({
         />
 
         {/* Main Content Pane */}
-        <main className="flex-1 overflow-y-auto pb-20 md:pb-8">
-          <div className="max-w-4xl mx-auto w-full md:py-8 md:px-10">
+        <main className="flex-1 overflow-y-auto pb-24 md:pb-10">
+          <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 md:py-8 md:px-10">
             {children}
           </div>
         </main>

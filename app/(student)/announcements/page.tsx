@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import AnnouncementCard from '@/components/features/AnnouncementCard'
+import AnnouncementsViewer from '@/components/features/AnnouncementsViewer'
 
 export const revalidate = 0
 
@@ -20,46 +20,31 @@ export default async function AnnouncementsPage() {
   }
 
   const allAnnouncements = announcements || []
-  const firstUrgentIndex = allAnnouncements.findIndex((a) => a.priority === 'urgent')
 
   return (
-    <div className="p-5 flex flex-col gap-5">
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto flex flex-col gap-5">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
           href="/"
-          className="p-1.5 text-gray-400 hover:text-brand hover:bg-gray-150/50 rounded-lg transition-all"
+          className="p-2 text-gray-500 hover:text-[#660100] bg-white hover:bg-gray-100 rounded-xl border border-gray-200 transition-all shadow-2xs"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
         <div>
-          <h1 className="font-display font-semibold text-lg text-gray-900 leading-tight">Announcements</h1>
-          <p className="text-[10px] text-gray-400 font-medium">HT Housing Updates & Notifications from Residence Life</p>
+          <h1 className="font-display font-bold text-xl text-gray-900 leading-tight">
+            Announcements & Bulletins
+          </h1>
+          <p className="text-xs text-gray-500 font-medium">
+            Official Residence Life notices, campus updates & event flyers
+          </p>
         </div>
       </div>
 
-      {/* Announcements List */}
-      {allAnnouncements.length === 0 ? (
-        <div className="bg-white border border-[#E5E8EF] p-10 rounded-2xl text-center text-xs text-gray-450">
-          No announcements posted yet. Check back soon for updates.
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {allAnnouncements.map((ann, idx) => {
-            const isPinned = idx === firstUrgentIndex
-            return (
-              <AnnouncementCard
-                key={ann.id}
-                announcement={ann}
-                isPinned={isPinned}
-                defaultExpanded={isPinned}
-              />
-            )
-          })}
-        </div>
-      )}
+      {/* Announcements Interactive Viewer */}
+      <AnnouncementsViewer initialAnnouncements={allAnnouncements} />
     </div>
   )
 }
